@@ -1,0 +1,2 @@
+./clearBuild.sh
+./buildAndRun.sh
