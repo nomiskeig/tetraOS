@@ -37,8 +37,26 @@ int kprintf(const char *fmt,...) {
                     kputc(va_arg(args, char));
                     break;
                 case 'x':
-                    kputc(va_arg(args, int));
-                    break;
+                    // TODO: this is fucked as usual, there are hardcoded values (es kracht)
+                    {
+                        long num = va_arg(args, int);
+                        int hexdigits = 2 * sizeof(int) -1;
+                        char buf[hexdigits];
+
+                        int pos = 0;
+                        for (int i = hexdigits; i >= 0; i--) {
+                            int d = (num >> (4*i)) & 0xF;
+                            if (pos < 8) {
+                                buf[pos] = (d < 10) ? '0' + d : 'a' + d - 10;
+                            }
+                            pos++;
+                        }
+                        for (int i = 0; i < 8; i++) {
+                            kputc(buf[i]);
+                        }
+
+                        break;
+                    }
                 case 'c':
                     kputc(va_arg(args, char));
                     break;

@@ -18,4 +18,3 @@ j end
 
 stacks:
 .skip STACK_SIZE
-
