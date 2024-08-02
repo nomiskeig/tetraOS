@@ -15,7 +15,20 @@ add_custom_command(
     COMMAND qemu-system-riscv64 -machine virt -nographic -kernel os -bios none
 )
 
-add_custom_target(gdb)
-add_custom_command(TARGET gdb
+add_custom_target(debug)
+add_custom_command(TARGET debug
     COMMAND qemu-system-riscv64 -machine virt -nographic -kernel os -bios none -S -s
 )
+
+add_custom_target(gdb)
+add_custom_command(TARGET gdb
+    COMMAND gdb
+)
+
+add_custom_target(dis)
+add_custom_command(TARGET dis
+    
+    COMMAND /bin/riscv64-unknown-elf-objdump os -d
+)
+
+

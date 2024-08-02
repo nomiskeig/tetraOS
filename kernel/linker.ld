@@ -7,42 +7,40 @@ MEMORY
   ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 128M
 }
 
-PHDRS
-{
-  text PT_LOAD;
-  data PT_LOAD;
-  bss PT_LOAD;
-}
 
-SECTIONS
-{
-  .text : {
+/*FFFF800000000000*/
+SECTIONS {
+ 
+  . = 0x80000000;
+  .boot.data : {
+        *(.boot.data)
+    }
+  . += 0xFFFF800000000000;
+  .text ALIGN (4k): AT (ADDR (.text) - 0xFFFF800000000000) {
     PROVIDE(_text_start = .);
     *(.text.init) *(.text .text.*)
     PROVIDE(_text_end = .);
-  } >ram AT>ram :text
-
-  .rodata : {
+  } 
+  .rodata ALIGN (4k): AT (ADDR (.rodata) - 0xFFFF800000000000) {
     PROVIDE(_rodata_start = .);
     *(.rodata .rodata.*)
     PROVIDE(_rodata_end = .);
-  } >ram AT>ram :text
+  } 
 
-  .data : {
-    . = ALIGN(4096);
+  .data ALIGN (4k): AT (ADDR (.data) - 0xFFFF800000000000) {
     PROVIDE(_data_start = .);
     *(.sdata .sdata.*) *(.data .data.*)
     PROVIDE(_data_end = .);
-  } >ram AT>ram :data
+  } 
 
-  .bss :{
+  .bss ALIGN (4k) : AT (ADDR (.bss) - 0xFFFF800000000000) {
     PROVIDE(_bss_start = .);
     *(.sbss .sbss.*) *(.bss .bss.*)
     PROVIDE(_bss_end = .);
-  } >ram AT>ram :bss
-
-        PROVIDE(_heap_start = .);
+  } 
+        PROVIDE(_heap_start = . );
   PROVIDE(_memory_start = ORIGIN(ram));
   PROVIDE(_memory_end = ORIGIN(ram) + LENGTH(ram));
-    PROVIDE(_heap_size = _memory_end -_heap_start);
+    PROVIDE(_heap_size = 0xFFFF800000000000 + _memory_end -_heap_start);
 }
+
