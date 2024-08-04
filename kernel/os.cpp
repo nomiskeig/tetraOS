@@ -7,8 +7,8 @@ extern "C" int os_start(void) {
 
 
 
-    printf("Booted to OS\n");
     uart_init();
+    printf("Booted to OS\n");
     physical_allocator_init();
     void* first_frame = kalloc_frame();
     void* second_frame = kalloc_frame();

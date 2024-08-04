@@ -44,6 +44,7 @@ SECTIONS {
     *(.sbss .sbss.*) *(.bss .bss.*)
     PROVIDE(_bss_end = .);
   } 
+    PROVIDE(_uart = 0x10000000);
     PROVIDE(_heap_start = . );
     PROVIDE(_kernel_end = _heap_start);
     PROVIDE(_physical_memory_start = ORIGIN(ram));

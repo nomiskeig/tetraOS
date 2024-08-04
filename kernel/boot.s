@@ -13,6 +13,13 @@
 .boot_third_level_table: 
     .skip 4096
 
+.boot_uart_first_level_table:
+    .skip 4096
+.boot_uart_second_level_table:
+    .skip 4096
+.boot_uart_third_level_table:
+    .skip 4096
+
 
 .section .text
 _start:
@@ -36,7 +43,8 @@ _start:
     # s7 holds the pyhsical address, s8 the virtual
     add s7, a2, zero
     add s8, a0, zero
-    j boot_map_address
+    jal boot_map_address
+    j map_next_address
 
 map_next_address: 
     addi s11, zero, 0x1
@@ -48,11 +56,16 @@ map_next_address:
     # write s8 to a0 since the method expects it
     add a0, s8, zero
     # TODO: check bounds and jump to jump_to_c of bounds are correct
-    j boot_map_address
+    jal boot_map_address
+    j map_next_address;
     
 
 
 jump_to_c:
+    
+    # map the UART thingy
+    jal boot_uart_map_address
+
 
     # write the satp register 
     la a5, .boot_page_directory
@@ -75,7 +88,6 @@ jump_to_c:
     # set mepc to os_strt
     csrw mepc, t2
     # set mstatus.mpp to s
-    # for m-mode, thats already set to 11 so we have to set the bits to 01 
     # so we set bit 12 to zero
     # since the last mode is not available, we read 00 for bits 12 and 11 so we just set bit 11
     addi a1, zero, 1
@@ -93,6 +105,13 @@ jump_to_c:
     add a1, zero, zero
     not a1, a1
     csrw pmpaddr0, a1
+
+    ## adjust stack pointer to use virtual adresses as well
+    addi a3, zero, 0
+    lui a3, %hi(0x80000000)
+    SLLI a3, a3, 16
+    add sp, sp, a3
+
 
     mret
 
@@ -173,10 +192,80 @@ boot_map_address:
     or s2, s2, s3 # make the entry valid, and make pte readable, writable and executable
     sd s2, 0(s1)
 
-
-    j map_next_address
+    ret
 
 
 
     
 
+
+    
+boot_uart_map_address:
+    # store the virtual adress in a0 
+    lui a0, %hi(0x80000000)
+    SLLI a0, a0, 16
+    la a1, _uart 
+    add a0, a1, a0 
+
+    #store the pyhsical address in s7
+    la s7, _uart
+
+    # first, get the highest 9 bits used and store the result into t1
+    srli a1, a0, 20 # shift right 39 bits
+    srli a1, a1, 19 # shift right 39 bits
+    andi a1, a1, 511  # and with 9 bits
+    # vpn 2 in a2
+    srli a2, a0, 20
+    srli a2, a2, 10
+    andi a2, a2, 511
+    # vpn 1 in a3
+    srli a3, a0, 21
+    andi a3, a3, 511
+    # vpn 0 in a4
+    srli a4, a0, 12 
+    andi a4, a4, 511
+
+    
+    # set .boot_first_level_table[a2] = .boot_second_level_table
+    la a5, .boot_first_level_table
+    addi s1, zero, 8
+    mul s1, s1, a2
+    add s1, s1, a5
+    la s2, .boot_uart_second_level_table
+    #slli s2, s2, 10
+    srli s2,s2,2
+    addi s3, zero, 0x1
+    or s2, s2, s3 # make the entry valid
+    sd s2, 0(s1)
+
+
+    # set .boot_second_level_table[a3] = .boot_third_level_table
+    la a5, .boot_uart_second_level_table
+    addi s1, zero, 8
+    mul s1, s1, a3
+    add s1, s1, a5
+    la s2, .boot_uart_third_level_table
+    #slli s2, s2, 10
+    srli s2,s2,2
+    addi s3, zero, 0x1
+    or s2, s2, s3 # make the entry valid
+    sd s2, 0(s1)
+
+    # set .boot_third_lebel_table[a4] = physical address
+    la a5, .boot_uart_third_level_table
+    addi s1, zero, 8
+    mul s1, s1, a4
+    add s1, s1, a5
+    # s7 holds the pyhsical address
+    add s2, zero, s7
+    #slli s2, s2, 10
+    srli s2,s2,2
+    addi s3, zero, 0xF
+    or s2, s2, s3 # make the entry valid, and make pte readable, writable and executable
+    sd s2, 0(s1)
+
+    ret
+
+
+
+    

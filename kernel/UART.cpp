@@ -1,5 +1,5 @@
 #include "UART.h"
-#define UART 0x10000000L
+#define UART 0xFFFF800000000000 + 0x10000000L
 #define UART_THR (volatile uint8_t *)(UART + 0x00) // THR:transmitter holding register
 #define UART_RHR (volatile uint8_t *)(UART + 0x00) // RHR:Receive holding register
 #define UART_DLL (volatile uint8_t *)(UART + 0x00) // LSB of Divisor Latch (write mode)
