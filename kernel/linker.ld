@@ -12,11 +12,17 @@ MEMORY
 SECTIONS {
  
   . = 0x80000000;
-  .boot.data : {
+  /*.boot.data : {
         *(.boot.data)
     }
+  .boot.text : {
+        *(.boot.text)
+    }
+    */
+
   . += 0xFFFF800000000000;
   .text ALIGN (4k): AT (ADDR (.text) - 0xFFFF800000000000) {
+    PROVIDE(_kernel_start = .);
     PROVIDE(_text_start = .);
     *(.text.init) *(.text .text.*)
     PROVIDE(_text_end = .);
@@ -38,9 +44,10 @@ SECTIONS {
     *(.sbss .sbss.*) *(.bss .bss.*)
     PROVIDE(_bss_end = .);
   } 
-        PROVIDE(_heap_start = . );
-  PROVIDE(_memory_start = ORIGIN(ram));
-  PROVIDE(_memory_end = ORIGIN(ram) + LENGTH(ram));
-    PROVIDE(_heap_size = 0xFFFF800000000000 + _memory_end -_heap_start);
+    PROVIDE(_heap_start = . );
+    PROVIDE(_kernel_end = _heap_start);
+    PROVIDE(_physical_memory_start = ORIGIN(ram));
+    PROVIDE(_physical_memory_end = ORIGIN(ram) + LENGTH(ram));
+    PROVIDE(_heap_size = 0xFFFF800000000000 + _physical_memory_end -_heap_start);
 }
 

@@ -3,6 +3,10 @@
 #include "UART.h"
 
 extern "C" int os_start(void) {
+
+
+
+
     printf("Booted to OS\n");
     uart_init();
     physical_allocator_init();
