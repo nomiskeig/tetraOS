@@ -60,7 +60,8 @@ jump_to_c:
     slli a6, a6, 20
     slli a6, a6, 20
     slli a6, a6, 20
-    add a5, a5, a6
+    srli a5, a5, 12
+    or a5, a5, a6
     csrw satp, a5
 
 
@@ -70,7 +71,32 @@ jump_to_c:
     SLLI t1, t0, 16
     la a2, os_start
     add t2, t1, a2
-    jr t2
+    # prepare mret instruction
+    # set mepc to os_strt
+    csrw mepc, t2
+    # set mstatus.mpp to s
+    # for m-mode, thats already set to 11 so we have to set the bits to 01 
+    # so we set bit 12 to zero
+    # since the last mode is not available, we read 00 for bits 12 and 11 so we just set bit 11
+    addi a1, zero, 1
+    slli a1, a1, 11
+    csrr a2, mstatus
+    or a1, a1, a2
+    csrw mstatus, a1
+
+
+    # see https://www.reddit.com/r/RISCV/comments/uhcrf7/comment/i75amb4/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button
+    # handle pmp
+    addi a1, zero, 0x1f
+    csrw pmpcfg0, a1
+
+    add a1, zero, zero
+    not a1, a1
+    csrw pmpaddr0, a1
+
+    mret
+
+
 
 park:
     wfi
@@ -103,7 +129,8 @@ boot_map_address:
     mul s1, s1, a1
     add s1, s1, a5
     la s2, .boot_first_level_table
-    slli s2, s2, 10
+    #slli s2, s2, 10
+    srli s2,s2,2
     addi s3, zero, 0x1
     or s2, s2, s3 # make the entry valid
     sd s2, 0(s1)
@@ -114,7 +141,8 @@ boot_map_address:
     mul s1, s1, a2
     add s1, s1, a5
     la s2, .boot_second_level_table
-    slli s2, s2, 10
+    #slli s2, s2, 10
+    srli s2,s2,2
     addi s3, zero, 0x1
     or s2, s2, s3 # make the entry valid
     sd s2, 0(s1)
@@ -126,7 +154,8 @@ boot_map_address:
     mul s1, s1, a3
     add s1, s1, a5
     la s2, .boot_third_level_table
-    slli s2, s2, 10
+    #slli s2, s2, 10
+    srli s2,s2,2
     addi s3, zero, 0x1
     or s2, s2, s3 # make the entry valid
     sd s2, 0(s1)
@@ -138,7 +167,8 @@ boot_map_address:
     add s1, s1, a5
     # s7 holds the pyhsical address
     add s2, zero, s7
-    slli s2, s2, 10
+    #slli s2, s2, 10
+    srli s2,s2,2
     addi s3, zero, 0xF
     or s2, s2, s3 # make the entry valid, and make pte readable, writable and executable
     sd s2, 0(s1)
