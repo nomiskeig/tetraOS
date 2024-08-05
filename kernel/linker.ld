@@ -45,10 +45,10 @@ SECTIONS {
     PROVIDE(_bss_end = .);
   } 
     PROVIDE(_uart = 0x10000000);
-    PROVIDE(_heap_start = . );
-    PROVIDE(_kernel_end = _heap_start);
+    PROVIDE(_physical_heap_start = . - 0xFFFF800000000000 );
+    PROVIDE(_kernel_end = _bss_end);
     PROVIDE(_physical_memory_start = ORIGIN(ram));
     PROVIDE(_physical_memory_end = ORIGIN(ram) + LENGTH(ram));
-    PROVIDE(_heap_size = 0xFFFF800000000000 + _physical_memory_end -_heap_start);
+    PROVIDE(_physical_heap_size = _physical_memory_end -_physical_heap_start);
 }
 

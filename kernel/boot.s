@@ -33,6 +33,13 @@ _start:
     lui s10, %hi(0x80000000)
     slli s10, s10, 16
     la s9, _kernel_end
+    # map 10 extra pages to give some space for initialization in cpp
+    addi a2, zero, 10
+    slli a2, a2, 12
+    add s9, a2, s9
+
+
+
     add s9, s10, s9
     # a0 holds the virtual start of the kernel
 

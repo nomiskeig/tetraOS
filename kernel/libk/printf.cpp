@@ -1,6 +1,7 @@
-#include "../include/libk/printf.h"
+#include "../include/libk/kstdio.h"
 #include "../UART.h"
 #include <cstdarg>
+
 
 void printf(char const *fmt, ...) {
     va_list args;

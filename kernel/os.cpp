@@ -1,6 +1,7 @@
-#include "include/libk/printf.h"
-#include "os.h"
+#include "include/libk/kstdio.h"
+#include "include/os.h"
 #include "UART.h"
+#include "include/memory.h"
 
 extern "C" int os_start(void) {
 
@@ -10,12 +11,7 @@ extern "C" int os_start(void) {
     uart_init();
     printf("Booted to OS\n");
     physical_allocator_init();
-    void* first_frame = kalloc_frame();
-    void* second_frame = kalloc_frame();
-    void* third_frame = kalloc_frame();
-    
-    kfree_frame(second_frame);
-    void* fourth_frame = kalloc_frame();
+    virtual_allocator_init();
 
     while(1) {}
     return 0;

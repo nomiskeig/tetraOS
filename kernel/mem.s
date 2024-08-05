@@ -29,11 +29,11 @@ PHYSICAL_MEMORY_START: .dword _physical_memory_start
 .global PHYSICAL_MEMORY_END
 PHYSICAL_MEMORY_END: .dword _physical_memory_end
 
-.global HEAP_START
-HEAP_START: .dword _heap_start
+.global PHYSICAL_HEAP_START
+PHYSICAL_HEAP_START: .dword _physical_heap_start
 
-.global HEAP_SIZE
-HEAP_SIZE: .dword _heap_size
+.global PHYSICAL_HEAP_SIZE
+PHYSICAL_HEAP_SIZE: .dword _physical_heap_size
 .global KERNEL_START
 KERNEL_START: .dword _kernel_start
 
