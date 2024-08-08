@@ -34,8 +34,15 @@ PHYSICAL_HEAP_START: .dword _physical_heap_start
 
 .global PHYSICAL_HEAP_SIZE
 PHYSICAL_HEAP_SIZE: .dword _physical_heap_size
+
 .global KERNEL_START
 KERNEL_START: .dword _kernel_start
+
+.global VIRTUAL_HEAP_START
+VIRTUAL_HEAP_START: .dword _virtual_heap_start
+
+.global VIRTUAL_HEAP_END
+VIRTUAL_HEAP_END: .dword _virtual_heap_end
 
 .global KERNEL_END 
 KERNEL_END: .dword _kernel_end

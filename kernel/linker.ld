@@ -46,6 +46,8 @@ SECTIONS {
   } 
     PROVIDE(_uart = 0x10000000);
     PROVIDE(_physical_heap_start = . - 0xFFFF800000000000 );
+    PROVIDE(_virtual_heap_start = .);
+    PROVIDE(_virtual_heap_end = 0xFFFFFFFFFFFFFFFF);
     PROVIDE(_kernel_end = _bss_end);
     PROVIDE(_physical_memory_start = ORIGIN(ram));
     PROVIDE(_physical_memory_end = ORIGIN(ram) + LENGTH(ram));

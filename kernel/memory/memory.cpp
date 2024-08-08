@@ -1,5 +1,6 @@
 #include "../include/memory.h"
 
+
 void *PhysicalFrame::get_virtual_address() {
     return (void *)((char *)this->physical_address + VIRTUAL_OFFSET);
 }
