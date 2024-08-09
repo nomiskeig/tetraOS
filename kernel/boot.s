@@ -25,7 +25,7 @@
 _start:
    csrr a0, mhartid 
     bnez a0, park
-    la sp, stacks + STACK_SIZE
+   la sp, stacks + STACK_SIZE
 
 
     # map the addresses
@@ -34,7 +34,7 @@ _start:
     slli s10, s10, 16
     la s9, _kernel_end
     # map 10 extra pages to give some space for initialization in cpp
-    addi a2, zero, 10
+    addi a2, zero, 13 
     slli a2, a2, 12
     add s9, a2, s9
 

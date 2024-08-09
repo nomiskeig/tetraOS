@@ -11,6 +11,7 @@ extern "C" int os_start(void) {
     uart_init();
     printf("Booted to OS\n");
     physical_allocator_init();
+    paging_init();
     virtual_allocator_init();
 
     while(1) {}

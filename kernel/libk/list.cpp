@@ -2,6 +2,7 @@
  void *AllocItem::get_start_address() { return this->virtual_address; }
 
 void AllocItem::set_start_address(void* address) {
+    this->virtual_address = address;
     }
 
 uint64_t AllocItem::get_size() { return this->size; }

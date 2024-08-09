@@ -2,8 +2,6 @@
 #define LIST_H
 
 #include <cstdint>
-#define ALLOC_PER_ITEM 32
-#define ALLOC_PER_ITEM_COUNTER_SIZE uint32_t
 class AllocItem {
 private:
     void *virtual_address;
@@ -17,11 +15,4 @@ public:
     void set_start_address(void *address);
 };
 
-class AllocList {
-private:
-    AllocItem first;
-    AllocItem *getFirst();
-public:
-    void set_first(AllocItem *item);
-};
 #endif
