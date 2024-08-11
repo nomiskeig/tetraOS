@@ -15,14 +15,15 @@ void virtual_allocator_init() {
     // PhysicalFrame physical_address = (PhysicalFrame)(uint64_t*)
     // kalloc_frame(); VirtualPage virtual_page = alloc_list = (AllocList
     // *)physical_address;
-    PhysicalFrame frame{kalloc_frame()};
-    VirtualPage page{frame.get_virtual_address()};
+    PhysicalFrame* frame = (PhysicalFrame*)kalloc_frame();
+    printf("gets here");
+    VirtualPage* page = (VirtualPage*)frame->get_virtual_address();
     // we have to operate on the virtual page
     
-    map_page(&page, &frame);
-    printf("Address of the frame:           0x%x\n", frame.get_address());
-    printf("Address of the virtual page:    0x%x\n", page.get_address());
-    AllocItem *first_item = (AllocItem*)(page.get_address());
+    map_page(page, frame);
+    printf("Address of the frame:           0x%x\n", frame->get_address());
+    printf("Address of the virtual page:    0x%x\n", page->get_address());
+    AllocItem *first_item = (AllocItem*)(page->get_address());
     first_item->set_start_address((void*)(first_item + 1));
     first_item->set_size(PAGE_SIZE - sizeof(AllocItem));
 

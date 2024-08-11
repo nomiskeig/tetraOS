@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#define VIRTUAL_UART 0xFFFF800000000000 + 0x10000000L
 #define VIRTUAL_OFFSET 0xFFFF800000000000
 #define FIRST_PAGE_TABLE_BASE 0xFFFFFFFFFFFFF000
 #define SECOND_PAGE_TABLE_BASE 0xFFFFFFFFFFE00000
@@ -12,12 +13,11 @@
 #define PAGE_SIZE 4096
 
 typedef uint64_t ppn_t;
+typedef uint64_t PageTableEntry;
 class VirtualPage {
 private:
-    void *virtual_address;
 
 public:
-    VirtualPage(void *);
     void *get_address();
     uint16_t get_vpn_3();
     uint16_t get_vpn_2();
@@ -28,30 +28,21 @@ public:
 
 class PhysicalFrame {
 private:
-    void *physical_address;
 
 public:
-    PhysicalFrame(void *);
     void *get_address();
     void *get_virtual_address();
     ppn_t get_ppn();
 };
 
-class PageTableEntry {
-private:
-    uint64_t entry;
-public:
-    ppn_t get_ppn();
-    void set_ppn(ppn_t ppn);
-
-};
 
 class PageTable {
 private:
     PageTableEntry entries[512];
 public:
-    PageTableEntry* getEntry(uint16_t index);
-    void setEntry(uint16_t index, PageTableEntry* entry);
+    ppn_t get_ppn();
+    PageTableEntry getEntry(uint16_t index);
+    void setEntry(uint16_t index, PageTableEntry entry);
     bool isValid();
 
 };

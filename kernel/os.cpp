@@ -12,6 +12,7 @@ extern "C" int os_start(void) {
     printf("Booted to OS\n");
     physical_allocator_init();
     paging_init();
+    printf("is after init");
     virtual_allocator_init();
 
     while(1) {}
