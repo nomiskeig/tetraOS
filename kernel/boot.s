@@ -34,7 +34,7 @@ _start:
     slli s10, s10, 16
     la s9, _kernel_end
     # map 10 extra pages to give some space for initialization in cpp
-    addi a2, zero, 20 
+    addi a2, zero, 140 
     slli a2, a2, 12
     add s9, a2, s9
 

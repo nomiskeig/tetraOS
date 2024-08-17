@@ -48,3 +48,36 @@ Mapping:
 map_page(virtual, physical)
 -> needs write access to physical pages
 -> tempory turn of paging?
+
+
+
+Recursive mapping:
+
+
+0xFFFF800000
+0x1111 1111 1111 1111 1000 0000 0000... 
+-> vpn_3 = 511 = 111111111
+0x1111 1111 1111 1111 1111 1111 1100 = 0xFFFFFFC0000...
+
+
+# NeAw plan
+
+new plan is the following: 
+We map the whole physcial address spacke into the virtual address space. After that, virutal addresses are free to use, especially the page tables stay mapped.
+
+In the setup in physicsal memeory, we map the kerenl.
+in the kernel itself, we allocate enough page tables for the whole physical address space
+The physcial 
+
+We map 128MB + 0x800000000
+10000000000000000000000000
+128 MB = 10000000000000000000000000 = 0x2000000
+
+
+Amount of required tables:
+ppn_2: 3
+ppn_1: for one address: 512 tables 
+-> total -> 3 * 512 tables = 1536 tables
+
+In total : 1 + 1 + 3 + 1536 tables = 1357 tables
+

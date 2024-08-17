@@ -2,24 +2,28 @@
 #include "../include/memory.h"
 extern uint64_t KERNEL_START;
 extern uint64_t KERNEL_END;
+static PageTable *first_level_table;
 extern "C" void switch_to_new_page_table(long);
 void map_page_for_setup(PageTable *first_table, PageTable *second_table,
                         PageTable *third_table, PageTable *fourth_table,
                         VirtualPage *page_to_map, PhysicalFrame *frame);
 
-PageTableEntry createValidPageTableEntry(ppn_t ppn) { return ((ppn & 0xFFFFFFFFFF)<< 10) | 1; }
-bool isValidPageTableEntry(PageTableEntry entry) {return entry & 1;};
+PageTableEntry createValidPageTableEntry(ppn_t ppn) {
+    return ((ppn & 0xFFFFFFFFFF) << 10) | 1;
+}
+bool isValidPageTableEntry(PageTableEntry entry) { return entry & 1; };
 void paging_init() {
     printf("Initialising paging\n");
-    PhysicalFrame* first_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* second_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* third_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* fourth_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* uart_second_table_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* uart_third_table_frame = (PhysicalFrame*)kalloc_frame();
-    PhysicalFrame* uart_fourth_table_frame = (PhysicalFrame*)kalloc_frame();
+    PhysicalFrame *first_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *second_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *third_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *fourth_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *uart_second_table_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *uart_third_table_frame = (PhysicalFrame *)kalloc_frame();
+    PhysicalFrame *uart_fourth_table_frame = (PhysicalFrame *)kalloc_frame();
     PageTable *first_table =
         (PageTable *)((char *)first_frame->get_address() + VIRTUAL_OFFSET);
+    first_level_table = first_table;
     PageTable *second_table =
         (PageTable *)((char *)second_frame->get_address() + VIRTUAL_OFFSET);
     PageTable *third_table =
@@ -27,15 +31,20 @@ void paging_init() {
     PageTable *fourth_table =
         (PageTable *)((char *)fourth_frame->get_address() + VIRTUAL_OFFSET);
     PageTable *second_uart_table =
-        (PageTable *)((char *)uart_second_table_frame->get_address() + VIRTUAL_OFFSET);
+        (PageTable *)((char *)uart_second_table_frame->get_address() +
+                      VIRTUAL_OFFSET);
     PageTable *third_uart_table =
-        (PageTable *)((char *)uart_third_table_frame->get_address() + VIRTUAL_OFFSET);
+        (PageTable *)((char *)uart_third_table_frame->get_address() +
+                      VIRTUAL_OFFSET);
     PageTable *fourth_uart_table =
-        (PageTable *)((char *)uart_fourth_table_frame->get_address() + VIRTUAL_OFFSET);
+        (PageTable *)((char *)uart_fourth_table_frame->get_address() +
+                      VIRTUAL_OFFSET);
     // set the recursion
-    printf("recuring entry in first table: 0x%x with ppn 0x%x\n", createValidPageTableEntry(first_table->get_ppn() ), first_table->get_ppn());
-    first_table->setEntry(511,
-                          createValidPageTableEntry(first_table->get_ppn()) | 0xF);
+    printf("recuring entry in first table: 0x%x with ppn 0x%x\n",
+           createValidPageTableEntry(first_table->get_ppn()),
+           first_frame->get_ppn());
+    first_table->setEntry(
+        511, createValidPageTableEntry(first_frame->get_ppn()) | 0x7);
     printf("Kernel start: 0x%x\n", KERNEL_START);
     printf("Kernel end:   0x%x\n", KERNEL_END);
     printf("New ppn: 0x%x\n", first_frame->get_ppn());
@@ -53,11 +62,14 @@ void paging_init() {
     }
 
     // map the uart thingy
-    VirtualPage* uart_page = (VirtualPage*)VIRTUAL_UART;
-    PhysicalFrame* uart_frame = (PhysicalFrame*)VIRTUAL_UART - VIRTUAL_OFFSET;
-    map_page_for_setup(
-        first_table, second_table, third_uart_table, fourth_uart_table, uart_page, uart_frame);
+    VirtualPage *uart_page = (VirtualPage *)VIRTUAL_UART;
+    PhysicalFrame *uart_frame = (PhysicalFrame *)VIRTUAL_UART - VIRTUAL_OFFSET;
+    map_page_for_setup(first_table, second_table, third_uart_table,
+                       fourth_uart_table, uart_page, uart_frame);
 
+    // map the first table
+    map_page_for_setup(first_table, second_table, third_table, fourth_table,
+                       (VirtualPage *)first_table, first_frame);
 
     printf("switching to new table with ppn 0x%x\n", first_frame->get_ppn());
 
@@ -88,7 +100,8 @@ void map_page_for_setup(PageTable *first_table, PageTable *second_table,
                            createValidPageTableEntry(third_table->get_ppn()));
     third_table->setEntry(vpn_1,
                           createValidPageTableEntry(fourth_table->get_ppn()));
-    fourth_table->setEntry(vpn_0, createValidPageTableEntry(frame->get_ppn()) | 0xF);
+    fourth_table->setEntry(vpn_0,
+                           createValidPageTableEntry(frame->get_ppn()) | 0xF);
 }
 
 void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
@@ -98,8 +111,15 @@ void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
     // check and map the first level
     uint16_t vpn_3 = virtual_page->get_vpn_3();
     printf("vpn_3: 0x%x\n", vpn_3);
-    PageTable *first_level_table = (PageTable *)FIRST_PAGE_TABLE_BASE;
-    printf("First entry in table: 1x%x", first_level_table->getEntry(511));
+
+    printf("First entry in table: 0x%x\n", first_level_table);
+    printf("is valid: 0x%x\n", first_level_table->getEntry(511) & 0x1);
+    printf("entry of vpn at first level table: 0x%x\n",
+           first_level_table->getEntry(vpn_3));
+    PageTable *second_level_table =
+        (PageTable *)SECOND_PAGE_TABLE_BASE + virtual_page->get_vpn_3();
+    printf("second table in mapping: 0x%x\n",
+           second_level_table->getEntry(virtual_page->get_vpn_2()));
 }
 
 void PageTable::setEntry(uint16_t index, PageTableEntry entry) {
@@ -109,5 +129,6 @@ void PageTable::setEntry(uint16_t index, PageTableEntry entry) {
 PageTableEntry PageTable::getEntry(uint16_t index) {
     return this->entries[index];
 }
-uint64_t PageTable::get_ppn() { return (((uint64_t)this - VIRTUAL_OFFSET) >> 12) & 0xFFFFFFFFFFF; }
-
+uint64_t PageTable::get_ppn() {
+    return (((uint64_t)this - VIRTUAL_OFFSET) >> 12) & 0xFFFFFFFFFFF;
+}
