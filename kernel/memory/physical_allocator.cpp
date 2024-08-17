@@ -37,8 +37,8 @@ uint64_t allign_address(uint64_t address, uint64_t num) {
     return (address + num - 1) & ~(num - 1);
 }
 void physical_allocator_init() {
-    /* We have 128 mb of ram, that is 2^^27 / 2^^12 = 2 ^^ 15 pages
-     * One page can manage 2^^12 pages, thus we need 2^^15 / 2^^12 = 2^^3 = 8
+    /* We have 4096 mb of ram, that is 2^^32 / 2^^12 = 2 ^^ 20 pages
+     * One page can manage 2^^12 pages, thus we need 2^^20 / 2^^12 = 2^^8 = 256
      * pages for management
      *
      */

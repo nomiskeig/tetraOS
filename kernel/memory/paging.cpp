@@ -2,10 +2,11 @@
 #include "../include/memory.h"
 extern uint64_t KERNEL_START;
 extern uint64_t KERNEL_END;
+extern uint64_t PHYSICAL_MEMORY_END;
 static PageTable *first_level_table;
 extern "C" void switch_to_new_page_table(long);
+#define GIGAYBTE_BYTES 0x40000000
 void map_page_for_setup(PageTable *first_table, PageTable *second_table,
-                        PageTable *third_table, PageTable *fourth_table,
                         VirtualPage *page_to_map, PhysicalFrame *frame);
 
 PageTableEntry createValidPageTableEntry(ppn_t ppn) {
@@ -16,35 +17,15 @@ void paging_init() {
     printf("Initialising paging\n");
     PhysicalFrame *first_frame = (PhysicalFrame *)kalloc_frame();
     PhysicalFrame *second_frame = (PhysicalFrame *)kalloc_frame();
-    PhysicalFrame *third_frame = (PhysicalFrame *)kalloc_frame();
-    PhysicalFrame *fourth_frame = (PhysicalFrame *)kalloc_frame();
-    PhysicalFrame *uart_second_table_frame = (PhysicalFrame *)kalloc_frame();
-    PhysicalFrame *uart_third_table_frame = (PhysicalFrame *)kalloc_frame();
-    PhysicalFrame *uart_fourth_table_frame = (PhysicalFrame *)kalloc_frame();
     PageTable *first_table =
         (PageTable *)((char *)first_frame->get_address() + VIRTUAL_OFFSET);
+    
+    printf("first level table: 0x%x\n", first_table);
+    
     first_level_table = first_table;
     PageTable *second_table =
         (PageTable *)((char *)second_frame->get_address() + VIRTUAL_OFFSET);
-    PageTable *third_table =
-        (PageTable *)((char *)third_frame->get_address() + VIRTUAL_OFFSET);
-    PageTable *fourth_table =
-        (PageTable *)((char *)fourth_frame->get_address() + VIRTUAL_OFFSET);
-    PageTable *second_uart_table =
-        (PageTable *)((char *)uart_second_table_frame->get_address() +
-                      VIRTUAL_OFFSET);
-    PageTable *third_uart_table =
-        (PageTable *)((char *)uart_third_table_frame->get_address() +
-                      VIRTUAL_OFFSET);
-    PageTable *fourth_uart_table =
-        (PageTable *)((char *)uart_fourth_table_frame->get_address() +
-                      VIRTUAL_OFFSET);
-    // set the recursion
-    printf("recuring entry in first table: 0x%x with ppn 0x%x\n",
-           createValidPageTableEntry(first_table->get_ppn()),
-           first_frame->get_ppn());
-    first_table->setEntry(
-        511, createValidPageTableEntry(first_frame->get_ppn()) | 0x7);
+    printf("second level table: 0x%x\n", second_table);
     printf("Kernel start: 0x%x\n", KERNEL_START);
     printf("Kernel end:   0x%x\n", KERNEL_END);
     printf("New ppn: 0x%x\n", first_frame->get_ppn());
@@ -53,26 +34,17 @@ void paging_init() {
     // method as it uses the recursive page table that is not set up in the boot
     // table mapping and it would use the old table which does not help us
     // we also map 8 pages for the physical memory management
-    for (VirtualPage *kernel_page = (VirtualPage *)KERNEL_START;
-         (uint64_t)kernel_page <= KERNEL_END + 4096 * 8; kernel_page += 4096) {
+    printf("physcial memeory end: 0x%x\n", PHYSICAL_MEMORY_END);
+    for (uint64_t kernel_page = VIRTUAL_OFFSET;
+         (uint64_t)kernel_page < VIRTUAL_OFFSET + (uint64_t)4 * GIGAYBTE_BYTES;
+         kernel_page += GIGAYBTE_BYTES) {
         printf("Kernel  page: 0x%x\n", kernel_page);
-        map_page_for_setup(
-            first_table, second_table, third_table, fourth_table, kernel_page,
-            (PhysicalFrame *)((char *)kernel_page - VIRTUAL_OFFSET));
+        map_page_for_setup(first_table, second_table,
+                           (VirtualPage *)kernel_page,
+                           (PhysicalFrame *)(kernel_page - VIRTUAL_OFFSET));
     }
 
-    // map the uart thingy
-    VirtualPage *uart_page = (VirtualPage *)VIRTUAL_UART;
-    PhysicalFrame *uart_frame = (PhysicalFrame *)VIRTUAL_UART - VIRTUAL_OFFSET;
-    map_page_for_setup(first_table, second_table, third_uart_table,
-                       fourth_uart_table, uart_page, uart_frame);
-
     // map the first table
-    map_page_for_setup(first_table, second_table, third_table, fourth_table,
-                       (VirtualPage *)first_table, first_frame);
-
-    printf("switching to new table with ppn 0x%x\n", first_frame->get_ppn());
-
     switch_to_new_page_table((uint64_t)first_frame->get_ppn());
 }
 
@@ -80,8 +52,8 @@ void paging_init() {
 // This method can not map arbitrary pages, use the map_page function instead
 // This method maps pages assuming that they are all mapped by the same four
 // tables
+//
 void map_page_for_setup(PageTable *first_table, PageTable *second_table,
-                        PageTable *third_table, PageTable *fourth_table,
                         VirtualPage *page_to_map, PhysicalFrame *frame) {
     printf("page: 0x%x, frame: 0x%x\n", page_to_map, frame);
     uint16_t vpn_3 = page_to_map->get_vpn_3();
@@ -97,10 +69,6 @@ void map_page_for_setup(PageTable *first_table, PageTable *second_table,
     first_table->setEntry(vpn_3,
                           createValidPageTableEntry(second_table->get_ppn()));
     second_table->setEntry(vpn_2,
-                           createValidPageTableEntry(third_table->get_ppn()));
-    third_table->setEntry(vpn_1,
-                          createValidPageTableEntry(fourth_table->get_ppn()));
-    fourth_table->setEntry(vpn_0,
                            createValidPageTableEntry(frame->get_ppn()) | 0xF);
 }
 
