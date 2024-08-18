@@ -2,13 +2,18 @@
 #define LIST_H
 
 #include <cstdint>
-class AllocItem {
+class FreeSpace {
 private:
     void *virtual_address;
-    uint64_t size;
-    AllocItem *next;
+    uint64_t status;
+    FreeSpace *next;
+
 
 public:
+    bool is_last();
+    void set_last();
+    void set_not_last();
+    FreeSpace* get_next();
     void *get_start_address();
     uint64_t get_size();
     void set_size(uint64_t size);

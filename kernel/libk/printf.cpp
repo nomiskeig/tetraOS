@@ -4,10 +4,15 @@
 #include <cstdarg>
 
 
-//void AllocItem::set_start_address(void* address) {}
-void printf(char const *fmt, ...) {
+void printf(char const* fmt, ...) {
     va_list args;
     va_start(args, fmt);
+    vprintf(fmt, args);
+    va_end(args);
+
+}
+//void AllocItem::set_start_address(void* address) {}
+void vprintf(char const *fmt, va_list args) {
     while (*fmt) {
         if (*fmt == '%') {
             fmt++;

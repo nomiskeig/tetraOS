@@ -4,7 +4,7 @@ ENTRY( _start )
 
 MEMORY
 {
-  ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 4096M 
+  ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 2048M 
 }
 
 
@@ -46,7 +46,7 @@ SECTIONS {
   } 
     PROVIDE(_uart = 0x10000000);
     PROVIDE(_physical_heap_start = . - 0xFFFF800000000000 );
-    PROVIDE(_virtual_heap_start = .);
+    PROVIDE(_virtual_heap_start = ORIGIN(ram) + LENGTH(ram) + 0xFFFF800000000000);
     PROVIDE(_virtual_heap_end = 0xFFFFFFFFFFFFFFFF);
     PROVIDE(_kernel_end = _bss_end);
     PROVIDE(_physical_memory_start = ORIGIN(ram));

@@ -1,10 +1,20 @@
 #include "../include/libk/list.h"
- void *AllocItem::get_start_address() { return this->virtual_address; }
+ void *FreeSpace::get_start_address() { return this->virtual_address; }
 
-void AllocItem::set_start_address(void* address) {
+void FreeSpace::set_start_address(void* address) {
     this->virtual_address = address;
     }
 
-uint64_t AllocItem::get_size() { return this->size; }
+uint64_t FreeSpace::get_size() { return this->status >> 1; }
 
-void AllocItem::set_size(uint64_t size) { this->size = size; }
+void FreeSpace::set_size(uint64_t size) { this->status = (size <<1) | (this->status & 0x1); }
+
+bool FreeSpace::is_last() {
+    return (this->status & 0x1) == 0x1;
+}
+void FreeSpace::set_not_last() {
+    this->status = (this->status >> 1) << 1;
+    }
+void FreeSpace::set_last() {
+    this->status |= 0x1;
+}

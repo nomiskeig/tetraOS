@@ -1,6 +1,7 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
+#include <cstddef>
 #include <cstdint>
 
 #define VIRTUAL_UART 0xFFFF800000000000 + 0x10000000L
@@ -42,6 +43,7 @@ private:
 public:
     ppn_t get_ppn();
     PageTableEntry getEntry(uint16_t index);
+    PhysicalFrame* getPhysicalFrame(uint16_t index);
     void setEntry(uint16_t index, PageTableEntry entry);
     bool isValid();
 
@@ -51,6 +53,7 @@ public:
 void physical_allocator_init();
 void virtual_allocator_init();
 void *kalloc_frame();
+void *kalloc(size_t size);
 void kfree_frame(void *);
 void paging_init();
 void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame);

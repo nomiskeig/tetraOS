@@ -5,7 +5,7 @@
 typedef uint64_t pageframe_t;
 #define FRAME_SIZE 4096
 #define FRAMES_FOR_MANAGING 8
-#define VIRTUAL_OFFSET  0xFFFF800000000000
+#define VIRTUAL_OFFSET 0xFFFF800000000000
 extern int64_t TEXT_START;
 extern int64_t TEXT_END;
 extern int64_t RODATA_START;
@@ -16,7 +16,6 @@ extern int64_t BSS_START;
 extern int64_t BSS_END;
 extern int64_t PHYSICAL_HEAP_START;
 extern int64_t PHYSICAL_HEAP_SIZE;
-
 
 static uint64_t managed_frames_address_start;
 static pageframe_t first_frame_address;
@@ -37,32 +36,36 @@ uint64_t allign_address(uint64_t address, uint64_t num) {
     return (address + num - 1) & ~(num - 1);
 }
 void physical_allocator_init() {
+    log(LogLevel::PHYSICAL_MEMORY, "Initialising physical allocator");
     /* We have 4096 mb of ram, that is 2^^32 / 2^^12 = 2 ^^ 20 pages
      * One page can manage 2^^12 pages, thus we need 2^^20 / 2^^12 = 2^^8 = 256
      * pages for management
      *
      */
     uint32_t num_frames = PHYSICAL_HEAP_SIZE / FRAME_SIZE - FRAMES_FOR_MANAGING;
-    printf("Memory regions:\n");
-    printf("TEXT:            0x%x -> 0x%x\n", TEXT_START, TEXT_END);
-    printf("RODATA:          0x%x -> 0x%x\n", RODATA_START, RODATA_END);
-    printf("DATA:            0x%x -> 0x%x\n", DATA_START, DATA_END);
-    printf("BSS:             0x%x -> 0x%x\n", BSS_START, BSS_END);
-    printf("PHYSICAL HEAP:   0x%x -> 0x%x\n", PHYSICAL_HEAP_START, PHYSICAL_HEAP_START + PHYSICAL_HEAP_SIZE);
-    printf("-----\n");
-    printf("Paging:\n");
-    printf("Amount of frames: %i\n", num_frames);
+    log(LogLevel::SYSTEM, "TEXT:            0x%x -> 0x%x", TEXT_START,
+        TEXT_END);
+    log(LogLevel::SYSTEM, "RODATA:          0x%x -> 0x%x", RODATA_START,
+        RODATA_END);
+    log(LogLevel::SYSTEM, "DATA:            0x%x -> 0x%x", DATA_START,
+        DATA_END);
+    log(LogLevel::SYSTEM, "BSS:             0x%x -> 0x%x", BSS_START,
+        BSS_END);
+    log(LogLevel::SYSTEM, "PHYSICAL HEAP:   0x%x -> 0x%x",
+        PHYSICAL_HEAP_START, PHYSICAL_HEAP_START + PHYSICAL_HEAP_SIZE);
+    log(LogLevel::SYSTEM,
+        "Amount of frames for physical memory management: %i", num_frames);
 
     managed_frames_address_start = allign_address(BSS_END, FRAME_SIZE);
     first_frame_address = allign_address(
         PHYSICAL_HEAP_START + FRAMES_FOR_MANAGING * FRAME_SIZE, FRAME_SIZE);
-    printf("Location of frame management: 0x%x\n",
-           (long)managed_frames_address_start);
-    printf("First frame adress: 0x%x\n", (long)first_frame_address);
+    log(LogLevel::SYSTEM, "Location of frame management: 0x%x",
+        (long)managed_frames_address_start);
     for (uint32_t i = 0; i < num_frames; i++) {
         set_pageframe_free(
             (PageframeFlags *)(managed_frames_address_start + i));
     }
+    log(LogLevel::PHYSICAL_MEMORY, "Initialization of physical allocator done");
 }
 
 void *kalloc_frame() {
@@ -76,14 +79,10 @@ void *kalloc_frame() {
     set_pageframe_allocated(currentFrameFlags);
     pageframe_t addr = first_frame_address + currentIndex * FRAME_SIZE;
 
-    printf("Allocated frame %i at address 0x%x\n", currentIndex, (long)addr);
+    log(LogLevel::PHYSICAL_MEMORY, "Allocated frame %i at address 0x%x", currentIndex, (long)addr);
     return (void *)addr;
 };
 void kfree_frame(void *frame) {
     uint32_t index = get_frame_number((pageframe_t)frame);
     set_pageframe_free((PageframeFlags *)managed_frames_address_start + index);
 }
-
-
-
-
