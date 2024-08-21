@@ -45,7 +45,9 @@ void paging_init() {
 //
 void map_page_for_setup(PageTable *first_table, PageTable *second_table,
                         VirtualPage *page_to_map, PhysicalFrame *frame) {
-    log(LogLevel::PAGING, "Mapping page for initializion: page: 0x%x, frame: 0x%x", page_to_map, frame);
+    log(LogLevel::PAGING,
+        "Mapping page for initializion: page: 0x%x, frame: 0x%x", page_to_map,
+        frame);
     uint16_t vpn_3 = page_to_map->get_vpn_3();
     uint16_t vpn_2 = page_to_map->get_vpn_2();
     uint16_t vpn_1 = page_to_map->get_vpn_1();
@@ -58,14 +60,13 @@ void map_page_for_setup(PageTable *first_table, PageTable *second_table,
 
 void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
     log(LogLevel::PAGING, "Mapping virtual page 0x%x to physical frame 0x%x",
-           virtual_page->get_address(), physical_frame->get_address());
+        virtual_page->get_address(), physical_frame->get_address());
 
     // check and map the first level
     uint16_t vpn_3 = virtual_page->get_vpn_3();
 
-
     // check for invalid entry in first table
-    if ((first_level_table->getEntry(virtual_page->get_vpn_3()) & 0x1) != 0x1) {
+    if (!first_level_table->isEntryValid(virtual_page->get_vpn_3())) {
         // allocate new table and point to it
         PhysicalFrame *frame = (PhysicalFrame *)kalloc_frame();
         first_level_table->setEntry(
@@ -76,7 +77,7 @@ void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
                                                 virtual_page->get_vpn_3()) +
                                             VIRTUAL_OFFSET);
     // check for invalid entry in second table
-    if ((second_table->getEntry(virtual_page->get_vpn_2()) & 0x1) != 0x1) {
+    if (!second_table->isEntryValid(virtual_page->get_vpn_2())) {
         // allocate new table and point to it
         PhysicalFrame *frame = (PhysicalFrame *)kalloc_frame();
         second_table->setEntry(virtual_page->get_vpn_2(),
@@ -86,7 +87,7 @@ void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
                                                virtual_page->get_vpn_2()) +
                                            VIRTUAL_OFFSET);
     // check for invalid entry in third table
-    if ((third_table->getEntry(virtual_page->get_vpn_2()) & 0x1) != 0x2) {
+    if (!third_table->isEntryValid(virtual_page->get_vpn_1())) {
         // allocate new table and point to it
         PhysicalFrame *frame = (PhysicalFrame *)kalloc_frame();
         third_table->setEntry(virtual_page->get_vpn_1(),
@@ -98,6 +99,57 @@ void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
     fourth_table->setEntry(
         virtual_page->get_vpn_0(),
         createValidPageTableEntry(physical_frame->get_ppn()) | 0xF);
+}
+// Returns the physical address the provided virtual address is mapped to.
+// Retuns a null pointer if the virtual address is not mapped
+void *get_physical_address_of_virtual_address(void *virtual_address) {
+    // we assume that the page is already mapped
+    VirtualPage *virtual_page = (VirtualPage *)virtual_address;
+    // check and map the first level
+    uint16_t vpn_3 = virtual_page->get_vpn_3();
+
+    // check for invalid entry in first table
+    if (!first_level_table->isEntryValid(vpn_3)) {
+        log(LogLevel::ERROR,
+            "Translating virtual address went wrong: Index in first level "
+            "table at 0x%x is invalid.",
+            first_level_table);
+        return 0;
+    }
+    PageTable *second_table = (PageTable *)(first_level_table->getPhysicalFrame(
+                                                virtual_page->get_vpn_3()) +
+                                            VIRTUAL_OFFSET);
+    // check for invalid entry in second table
+    if (!second_table->isEntryValid(virtual_page->get_vpn_2())) {
+        log(LogLevel::ERROR,
+            "Translating virtual address went wrong: Index in second level "
+            "table at 0x%x is invalid.",
+            second_table);
+        return 0;
+    }
+    PageTable *third_table = (PageTable *)(second_table->getPhysicalFrame(
+                                               virtual_page->get_vpn_2()) +
+                                           VIRTUAL_OFFSET);
+    // check for invalid entry in third table
+    if (!third_table->isEntryValid(virtual_page->get_vpn_1())) {
+        log(LogLevel::ERROR,
+            "Translating virtual address went wrong: Index in third level "
+            "table at 0x%x is invalid.",
+            third_table);
+        return 0;
+    }
+    PageTable *fourth_table =
+        (PageTable *)(third_table->getPhysicalFrame(virtual_page->get_vpn_1()) +
+                      VIRTUAL_OFFSET);
+    // check for invalid entry in the fourth table
+    if (!fourth_table->isEntryValid(virtual_page->get_vpn_0())) {
+        log(LogLevel::ERROR,
+            "Translating virtual address went wrong: Index in fourth level "
+            "table at 0x%x is invalid.",
+            fourth_table);
+        return 0;
+    }
+    return fourth_table->getPhysicalFrame(virtual_page->get_vpn_0());
 }
 
 void PageTable::setEntry(uint16_t index, PageTableEntry entry) {
@@ -111,4 +163,8 @@ PhysicalFrame *PageTable::getPhysicalFrame(uint16_t index) {
 }
 uint64_t PageTable::get_ppn() {
     return (((uint64_t)this - VIRTUAL_OFFSET) >> 12) & 0xFFFFFFFFFFF;
+}
+
+bool PageTable::isEntryValid(uint16_t index) {
+    return (this->entries[index] & 0x1) == 0x1;
 }

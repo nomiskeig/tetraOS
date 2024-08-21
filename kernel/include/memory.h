@@ -45,7 +45,7 @@ public:
     PageTableEntry getEntry(uint16_t index);
     PhysicalFrame* getPhysicalFrame(uint16_t index);
     void setEntry(uint16_t index, PageTableEntry entry);
-    bool isValid();
+    bool isEntryValid(uint16_t index);
 
 };
 
@@ -53,10 +53,12 @@ public:
 void physical_allocator_init();
 void virtual_allocator_init();
 void *kalloc_frame();
-void *kalloc(size_t size);
+void *kalloc(uint64_t size);
 void kfree_frame(void *);
 void paging_init();
 void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame);
+void* get_physical_address_of_virtual_address(void * virtual_address);
+void memory_barrier();
 
 #endif
 
