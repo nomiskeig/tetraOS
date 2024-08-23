@@ -54,7 +54,7 @@ void physical_allocator_init() {
     log(LogLevel::SYSTEM, "PHYSICAL HEAP:   0x%x -> 0x%x",
         PHYSICAL_HEAP_START, PHYSICAL_HEAP_START + PHYSICAL_HEAP_SIZE);
     log(LogLevel::SYSTEM,
-        "Amount of frames for physical memory management: %i", num_frames);
+        "Amount of frames that can be allocated by the physical allocator: %i", num_frames);
 
     managed_frames_address_start = allign_address(BSS_END, FRAME_SIZE);
     first_frame_address = allign_address(

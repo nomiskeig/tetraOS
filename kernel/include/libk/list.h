@@ -4,7 +4,6 @@
 #include <cstdint>
 class FreeSpace {
 private:
-    void *virtual_address;
     uint64_t status;
     FreeSpace *next;
 

@@ -7,6 +7,36 @@ extern uint64_t VIRTUAL_HEAP_START;
 static FreeSpace *free_list;
 static uint64_t virtual_alloc_end;
 
+void *operator new(size_t size) {
+    return kalloc(size);
+}
+void operator delete(void *p)  {
+    log(LogLevel::ERROR, "Unimplemented call to delete operator");
+    //kfree(p);
+}
+extern "C" void *memset(void* s, int c, size_t n) {
+    char * i  =(char*)s;
+    uint64_t counter = 0;
+    while (counter < n) {
+        *i = c;
+        i++;
+        counter++;
+
+    }
+    return s;
+
+}extern "C" void* memcpy(void *dest, const void *src, size_t len) {
+    char* dest_char = (char*)dest;
+    char* src_char = (char*)src;
+    size_t current = 0;
+    while (current < len) {
+        dest_char[current] = src_char[current];
+        current++;
+    }
+    return dest;
+
+}
+
 void virtual_allocator_init() {
     log(LogLevel::VIRTUAL_MEMORY, "Initialising virtual allocator");
     // this is the first frame on which we store our managing list

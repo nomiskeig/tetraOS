@@ -1,5 +1,8 @@
 #include "../include/memory.h"
+void memory_barrier() {
+    asm("fence");
 
+}
 
 void *PhysicalFrame::get_virtual_address() {
     return (void *)((char *)this + VIRTUAL_OFFSET);
@@ -39,7 +42,7 @@ uint16_t VirtualPage::get_vpn_0() {
 
 }
 uint16_t VirtualPage::get_offset() {
-    return (uint64_t)this & 511;
+    return (uint64_t)this & 0xFFF;
 
 }
 

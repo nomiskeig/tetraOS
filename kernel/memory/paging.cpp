@@ -149,7 +149,8 @@ void *get_physical_address_of_virtual_address(void *virtual_address) {
             fourth_table);
         return 0;
     }
-    return fourth_table->getPhysicalFrame(virtual_page->get_vpn_0());
+    uint64_t offset = virtual_page->get_offset();
+    return ((uint64_t*)((uint64_t)fourth_table->getPhysicalFrame(virtual_page->get_vpn_0()) | offset));
 }
 
 void PageTable::setEntry(uint16_t index, PageTableEntry entry) {

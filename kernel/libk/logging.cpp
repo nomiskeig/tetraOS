@@ -25,6 +25,12 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::SYSTEM:
         prefix = "[SYSTEM]";
         break;
+    case LogLevel::ERROR:
+        prefix = "\u001b[31m[ERROR]\u001b[37m";
+        break;
+    case LogLevel::VIRTIO:
+        prefix = "[VIRTIO]";
+        break;
     }
     printf(prefix);
     printf(" ");
@@ -33,8 +39,4 @@ void log(LogLevel level, char const *fmt, ...) {
     va_end(args);
 }
 
-
-void set_log_level(uint64_t level) {
-    logLevel = level;
-
-}
+void set_log_level(uint64_t level) { logLevel = level; }

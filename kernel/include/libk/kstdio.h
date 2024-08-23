@@ -9,6 +9,8 @@ enum LogLevel {
     VIRTUAL_MEMORY = 4,
     PHYSICAL_MEMORY = 8,
     SYSTEM = 16,
+    ERROR = 32,
+    VIRTIO = 64,
 
 };
 void printf(char const* fmt, ...);
