@@ -49,7 +49,8 @@ public:
 
 };
 
-
+extern "C" void *memcpy(void *dest, const void *src, size_t len);
+extern "C" void *memset(void* s, int c, size_t n);
 void physical_allocator_init();
 void virtual_allocator_init();
 void *kalloc_frame();

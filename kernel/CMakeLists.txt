@@ -6,11 +6,11 @@ project(TetraOS VERSION 1.0 LANGUAGES CXX ASM)
 add_executable(os boot.s  os.cpp UART.cpp UART.h mem.s)
 target_link_libraries(os PRIVATE libk)
 target_link_libraries(os PRIVATE memory)
-target_link_libraries(os PRIVATE io)
+target_link_libraries(os PRIVATE drivers)
 
 add_subdirectory(libk)
 add_subdirectory(memory)
-add_subdirectory(io)
+add_subdirectory(drivers)
 
 add_custom_target(qemu)
 add_custom_command(

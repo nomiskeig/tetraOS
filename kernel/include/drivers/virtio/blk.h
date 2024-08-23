@@ -41,13 +41,15 @@ private:
     VirtIODeviceRegisters *registers;
     VirtIOBlockDeviceConfig *config;
     VirtQueue *queue;
-
+    int basic_op(uint64_t sector, uint64_t length, char* buffer, uint8_t type);
+    int write_blocks(uint64_t sector, uint64_t length, char *buffer);
+    int read_blocks(uint64_t sector, uint64_t length, char *buffer);
 public:
     int init();
     void set_registers(VirtIODeviceRegisters *registers);
     void set_config(VirtIOBlockDeviceConfig *config);
-    void write(uint64_t offset, uint64_t length, char *buffer);
-    void read(uint64_t offset, uint64_t length, char *buffer);
+    int write(uint64_t offset, uint64_t length, char* buffer);
+    int read(uint64_t offset, uint64_t length, char* buffer);
 };
 
 VirtIOBlockDevice *get_block_device();

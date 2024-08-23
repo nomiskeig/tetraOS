@@ -1,6 +1,6 @@
-#include "../include/drivers/virtio/virtio.h"
-#include "../include/drivers/virtio/blk.h"
-#include "../include/libk/kstdio.h"
+#include "../../include/drivers/virtio/blk.h"
+#include "../../include/drivers/virtio/virtio.h"
+#include "../../include/libk/kstdio.h"
 
 static VirtIOBlockDevice *block_device;
 void VirtIOBlockDevice::set_registers(VirtIODeviceRegisters *registers) {
@@ -96,16 +96,11 @@ int VirtIOBlockDevice::init() {
         (uint64_t)get_physical_address_of_virtual_address(&queue->avail);
     this->registers->queue_device =
         (uint64_t)get_physical_address_of_virtual_address(&queue->used);
-    printf("Desc address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(&queue->desc));
     memory_barrier();
-    printf("Driver address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(&queue->avail));
-    printf("Device address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(&queue->used));
     // 7.7. Write 0x1 to QueueReady.
     this->registers->queue_ready = 0x1;
 
+    this->config->writeback = 0x0;
     uint64_t device_size = this->config->capacity;
     uint16_t amount_queues = this->config->num_queues;
     printf("capacity: 0x%x\n", device_size);
@@ -119,37 +114,82 @@ int VirtIOBlockDevice::init() {
 
     return 0;
 }
-/*
- * Reads length bytes from the offset. Offset is given in bytes. Result is
- * written into buffer.
- */
-void VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
-    VirtIOBlkRequest *request = new VirtIOBlkRequest(0, 2);
-    request->status.status = 0x12;
-    printf("gets here, 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(request));
 
-    void* volatile data_pointer = kalloc(512);
+/*
+ * Read length bytes starting at the offset into buffer.
+ */
+int VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
+    uint64_t sector = offset / 512;
+    uint64_t too_much_at_start = offset % 512;
+    uint64_t amount = length / 512;
+    uint64_t rest = length % 512;
+    char *temp_buffer = (char *)kalloc(512 * (amount + 1));
+    int res = this->read_blocks(sector, (amount + 1) * 512, temp_buffer);
+    if (res < 0) {
+        return res;
+    }
+    printf("too much at start: %i", too_much_at_start);
+    for (size_t i = 0; i < 512 / 8; i++) {
+        printf("temp_buff: 0x%x\n", 
+               *((uint64_t *)(temp_buffer + too_much_at_start) + i));
+    }
+    memcpy(buffer, temp_buffer + too_much_at_start, length);
+    // TODO: this seems to cut of the end of the starting word instead of the beginning.
+    // I do not know if that is correct and i am just thinking about it wrong or if its broken.
+    // Has to do with little endianess.
+
+    return 0;
+}
+
+/*
+ * Read length bytes starting from the given sector. The read bytes are written
+ * into buffer. Sectors have a size of 512 bytes.
+ */
+int VirtIOBlockDevice::read_blocks(uint64_t sector, uint64_t length,
+                                   char *buffer) {
+    return this->basic_op(sector, length, buffer, 0x0);
+}
+/*
+ * Write length bytes from buffer starting at the given sector.
+ * Sectors have a size of 512 bytes.
+ */
+int VirtIOBlockDevice::write_blocks(uint64_t sector, uint64_t length,
+                                    char *buffer) {
+    return this->basic_op(sector, length, buffer, 0x1);
+}
+
+/*
+ * Reads length bytes from the offset. Offset is given in multiples of 512.
+ * Result is written into buffer. Length has to be a multiple of 512.
+ */
+int VirtIOBlockDevice::basic_op(uint64_t sector, uint64_t length, char *buffer,
+                                uint8_t type) {
+
+    if (length % 512 != 0) {
+        log(LogLevel::ERROR,
+            "Length for basic block device op is not a multiple of 512.");
+        return -1;
+    }
+    if (type != 0x0 && type != 0x1) {
+        log(LogLevel::ERROR, "Type of operation has to be 0x0 or 0x1.");
+        return -1;
+    }
+    VirtIOBlkRequest *request = new VirtIOBlkRequest(type, sector);
+    request->status.status = 0x12;
     this->queue->desc[0].addr =
         (uint64_t)get_physical_address_of_virtual_address(&request->header);
-    printf("desc0 address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(&request->header));
     this->queue->desc[0].len = sizeof(VirtIOBlkRequestHeader);
     this->queue->desc[0].flags = VIRTQ_DESC_F_NEXT;
     this->queue->desc[0].next = 1;
     this->queue->desc[1].addr =
-        (uint64_t)get_physical_address_of_virtual_address(data_pointer);
-    printf("desc1 virtual address: 0x%x\n", &request->data);
-    printf("desc1 address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(data_pointer));
+        (uint64_t)get_physical_address_of_virtual_address(buffer);
     this->queue->desc[1].len = 512;
     this->queue->desc[1].next = 2;
-    this->queue->desc[1].flags = VIRTQ_DESC_F_NEXT | VIRTQ_DESC_F_WRITE;
+    this->queue->desc[1].flags = type == 0x1
+                                     ? VIRTQ_DESC_F_NEXT
+                                     : VIRTQ_DESC_F_NEXT | VIRTQ_DESC_F_WRITE;
     this->queue->desc[2].addr =
         (uint64_t)get_physical_address_of_virtual_address(&request->status);
-    printf("desc2 virtual address: 0x%x\n", &request->status);
-    printf("desc2 address: 0x%x\n",
-           (uint64_t)get_physical_address_of_virtual_address(&request->status));
     this->queue->desc[2].len = sizeof(VirtIOBlkRequestStatus);
     this->queue->desc[2].flags = VIRTQ_DESC_F_WRITE;
     this->queue->avail.ring[this->queue->avail.idx % VIRTIO_QUEUE_SIZE] = 0x0;
@@ -158,12 +198,10 @@ void VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
     memory_barrier();
     this->registers->queue_notify = 0x0;
     printf("read\n");
-    // while (true) {
-    printf("status: 0x%x\n", request->status.status);
-    for (size_t i = 0; i < 512/8; i++) {
-        printf("data at 0x%x: 0x%x\n", (uint64_t*)data_pointer + i, *((uint64_t*)(data_pointer) + i));
+    while (request->status.status == 0x12) {
+        printf("status: 0x%x\n", request->status.status);
     }
-    //}
+    return 0;
 }
 VirtIOBlockDevice *get_block_device() {
     if (block_device != 0x0) {

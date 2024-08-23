@@ -16,11 +16,16 @@ extern "C" int os_start(void) {
     *first = 0x1;
     log(LogLevel::ERROR, "test");
 
-    kalloc(sizeof(uint64_t));
-    kalloc(32);
     VirtIOBlockDevice* block_device = get_block_device();
     block_device->init();
-    block_device->read(0,0,0);
+    char* bytes = (char*)kalloc(512);
+    //*(uint32_t*)bytes = 0xDEADBEEF;
+    block_device->read(1, 32, bytes);
+    
+    for (size_t i = 0; i < 512 / 8; i++) {
+        printf("data at 0x%x: 0x%x\n", (uint64_t *)bytes + i,
+               *((uint64_t *)(bytes) + i));
+    }
     printf("gets here\n");
 
 
