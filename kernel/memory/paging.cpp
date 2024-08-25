@@ -1,5 +1,5 @@
-#include "../include/libk/kstdio.h"
-#include "../include/memory.h"
+#include <kernel/libk/kstdio.h>
+#include <kernel/memory.h>
 extern uint64_t KERNEL_START;
 extern uint64_t KERNEL_END;
 extern uint64_t PHYSICAL_MEMORY_END;

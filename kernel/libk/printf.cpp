@@ -1,7 +1,7 @@
-#include "../include/libk/kstdio.h"
-#include "../include/libk/list.h"
-#include "../UART.h"
-#include <cstdarg>
+#include <kernel/libk/kstdio.h> 
+#include <kernel/libk/list.h> 
+#include <kernel/UART.h> 
+#include <tlib/stdarg.h>
 
 
 void printf(char const* fmt, ...) {

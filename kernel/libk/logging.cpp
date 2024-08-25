@@ -1,5 +1,5 @@
-#include "../include/libk/kstdio.h"
-#include <cstdarg>
+#include <kernel/libk/kstdio.h> 
+#include <tlib/stdarg.h>
 
 static uint64_t logLevel = 0;
 void log(LogLevel level, char const *fmt, ...) {

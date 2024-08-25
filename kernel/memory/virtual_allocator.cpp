@@ -1,7 +1,7 @@
 
-#include "../include/libk/kstdio.h"
-#include "../include/libk/list.h"
-#include "../include/memory.h"
+#include <kernel/libk/kstdio.h>
+#include <kernel/libk/list.h>
+#include <kernel/memory.h>
 extern uint64_t VIRTUAL_HEAP_START;
 
 static FreeSpace *free_list;

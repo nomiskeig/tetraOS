@@ -1,6 +1,6 @@
-#include "../../include/drivers/virtio/blk.h"
-#include "../../include/drivers/virtio/virtio.h"
-#include "../../include/libk/kstdio.h"
+#include <kernel/drivers/virtio/blk.h>
+#include <kernel/drivers/virtio/virtio.h>
+#include <kernel/libk/kstdio.h>
 
 static VirtIOBlockDevice *block_device;
 void VirtIOBlockDevice::set_registers(VirtIODeviceRegisters *registers) {
@@ -128,11 +128,13 @@ int VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
     if (res < 0) {
         return res;
     }
-    printf("too much at start: %i", too_much_at_start);
+ /*   printf("too much at start: %i", too_much_at_start);
     for (size_t i = 0; i < 512 / 8; i++) {
         printf("temp_buff: 0x%x\n", 
                *((uint64_t *)(temp_buffer + too_much_at_start) + i));
+               }
     }
+    */
     memcpy(buffer, temp_buffer + too_much_at_start, length);
     // TODO: this seems to cut of the end of the starting word instead of the beginning.
     // I do not know if that is correct and i am just thinking about it wrong or if its broken.

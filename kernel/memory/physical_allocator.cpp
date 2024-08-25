@@ -1,7 +1,7 @@
-#include "../include//libk/kstdio.h"
-#include <cstdint>
+#include <kernel/libk/kstdio.h>
+#include <tlib/stdint.h>
 
-#include "../include/os.h"
+#include <kernel/os.h>
 typedef uint64_t pageframe_t;
 #define FRAME_SIZE 4096
 #define FRAMES_FOR_MANAGING 8

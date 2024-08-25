@@ -1,14 +1,14 @@
 
 #ifndef VIRTIODEVICE
 #define VIRTIODEVICE
-#include "../../memory.h"
+#include <tlib/stdint.h>
+#include <kernel/memory.h> 
 
 #define VIRTIO_START 0x10001000 + VIRTUAL_OFFSET
 #define VIRTIO_AMOUNT 8
 #define VIRTIO_SIZE 0x1000
 #define VIRTIO_QUEUE_SIZE 256
 
-#include <cstdint>
 enum VirtIODeviceID {
     NETWORK_CARD = 1,
     BLOCK_DEVICE = 2,

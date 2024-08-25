@@ -1,4 +1,5 @@
-#include "../include/libk/list.h"
+#include <kernel/libk/list.h>
+
 void *FreeSpace::get_start_address() { return this; }
 
 uint64_t FreeSpace::get_size() { return (this->status >> 1); }

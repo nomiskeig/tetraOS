@@ -2,7 +2,7 @@
 #ifndef OS_H
 #define OS_H
 
-#include <cstdint>
+#include <tlib/stdint.h> 
 // returns a pointer to virtual memory of size bytes
 void* kmalloc(uint32_t size);
 

@@ -1,6 +1,7 @@
 #ifndef BLKH
 #define BLKH
-#include "virtio.h"
+#include <tlib/stdint.h> 
+#include <kernel/drivers/virtio/virtio.h>
 class VirtIOBlockDeviceConfig {
 public:
     uint64_t capacity;

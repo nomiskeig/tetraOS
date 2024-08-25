@@ -1,6 +1,6 @@
 #ifndef UART_H
 #define UART_H
-#include <stdint.h>
+#include <tlib/stdint.h>
 
 
 #define UART_ADDR 0x10000000

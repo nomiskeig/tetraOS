@@ -1,4 +1,4 @@
-#include "../include/memory.h"
+#include <kernel/memory.h>
 void memory_barrier() {
     asm("fence");
 

@@ -1,8 +1,8 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include <cstddef>
-#include <cstdint>
+#include <tlib/stddef.h>
+#include <tlib/stdint.h>
 
 #define VIRTUAL_UART 0xFFFF800000000000 + 0x10000000L
 #define VIRTUAL_OFFSET 0xFFFF800000000000

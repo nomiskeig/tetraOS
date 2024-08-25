@@ -1,0 +1,92 @@
+[
+{
+  "directory": "/home/simon/dev/tetraOS/kernel",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/drivers/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/os.dir/boot.s.o -c /home/simon/dev/tetraOS/kernel/boot.s",
+  "file": "/home/simon/dev/tetraOS/kernel/boot.s",
+  "output": "CMakeFiles/os.dir/boot.s.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/drivers/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/os.dir/os.cpp.o -c /home/simon/dev/tetraOS/kernel/os.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/os.cpp",
+  "output": "CMakeFiles/os.dir/os.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/drivers/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/os.dir/UART.cpp.o -c /home/simon/dev/tetraOS/kernel/UART.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/UART.cpp",
+  "output": "CMakeFiles/os.dir/UART.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/drivers/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/os.dir/mem.s.o -c /home/simon/dev/tetraOS/kernel/mem.s",
+  "file": "/home/simon/dev/tetraOS/kernel/mem.s",
+  "output": "CMakeFiles/os.dir/mem.s.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/libk",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/libk.dir/list.cpp.o -c /home/simon/dev/tetraOS/kernel/libk/list.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/libk/list.cpp",
+  "output": "libk/CMakeFiles/libk.dir/list.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/libk",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/libk.dir/logging.cpp.o -c /home/simon/dev/tetraOS/kernel/libk/logging.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/libk/logging.cpp",
+  "output": "libk/CMakeFiles/libk.dir/logging.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/libk",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/libk.dir/printf.cpp.o -c /home/simon/dev/tetraOS/kernel/libk/printf.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/libk/printf.cpp",
+  "output": "libk/CMakeFiles/libk.dir/printf.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/memory",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/memory.dir/memory.cpp.o -c /home/simon/dev/tetraOS/kernel/memory/memory.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/memory/memory.cpp",
+  "output": "memory/CMakeFiles/memory.dir/memory.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/memory",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/memory.dir/paging.cpp.o -c /home/simon/dev/tetraOS/kernel/memory/paging.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/memory/paging.cpp",
+  "output": "memory/CMakeFiles/memory.dir/paging.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/memory",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/memory.dir/paging.s.o -c /home/simon/dev/tetraOS/kernel/memory/paging.s",
+  "file": "/home/simon/dev/tetraOS/kernel/memory/paging.s",
+  "output": "memory/CMakeFiles/memory.dir/paging.s.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/memory",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/memory.dir/physical_allocator.cpp.o -c /home/simon/dev/tetraOS/kernel/memory/physical_allocator.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/memory/physical_allocator.cpp",
+  "output": "memory/CMakeFiles/memory.dir/physical_allocator.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/memory",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/memory/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/memory.dir/virtual_allocator.cpp.o -c /home/simon/dev/tetraOS/kernel/memory/virtual_allocator.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/memory/virtual_allocator.cpp",
+  "output": "memory/CMakeFiles/memory.dir/virtual_allocator.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/drivers",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/drivers/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/drivers.dir/virtio/virtio.cpp.o -c /home/simon/dev/tetraOS/kernel/drivers/virtio/virtio.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/drivers/virtio/virtio.cpp",
+  "output": "drivers/CMakeFiles/drivers.dir/virtio/virtio.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/drivers",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/drivers/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/drivers.dir/ext2.cpp.o -c /home/simon/dev/tetraOS/kernel/drivers/ext2.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/drivers/ext2.cpp",
+  "output": "drivers/CMakeFiles/drivers.dir/ext2.cpp.o"
+},
+{
+  "directory": "/home/simon/dev/tetraOS/kernel/drivers",
+  "command": "/bin/riscv64-unknown-elf-g++  -I/home/simon/dev/tetraOS/kernel/drivers/../include -I/home/simon/dev/tetraOS/kernel/libk/../include -g -nostdlib -nostdinc -fno-builtin -ffreestanding -fno-rtti -fno-exceptions -mcmodel=medany -march=rv64imad_zicsr -mabi=lp64d -fno-threadsafe-statics -I/home/simon/dev/tetraOS/ -o CMakeFiles/drivers.dir/virtio/blk.cpp.o -c /home/simon/dev/tetraOS/kernel/drivers/virtio/blk.cpp",
+  "file": "/home/simon/dev/tetraOS/kernel/drivers/virtio/blk.cpp",
+  "output": "drivers/CMakeFiles/drivers.dir/virtio/blk.cpp.o"
+}
+]

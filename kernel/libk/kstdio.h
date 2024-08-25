@@ -1,8 +1,8 @@
 #ifndef KSTDIO_H
 #define KSTDIO_H
 
-#include <cstdarg>
-#include <cstdint>
+#include <tlib/stdarg.h>
+#include <tlib/stdint.h>
 enum LogLevel {
     DEBUG = 1,
     PAGING = 2,
@@ -13,10 +13,9 @@ enum LogLevel {
     VIRTIO = 64,
 
 };
-void printf(char const* fmt, ...);
-void log(LogLevel level, char const* fmt, ...);
+void printf(char const *fmt, ...);
+void log(LogLevel level, char const *fmt, ...);
 void set_log_level(uint64_t level);
-void vprintf(char const* fmt, va_list args);
-
+void vprintf(char const *fmt, va_list args);
 
 #endif
