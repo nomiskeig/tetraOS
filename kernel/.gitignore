@@ -2,7 +2,7 @@ CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
 Makefile
-os
+kernel
 *.a
 log.txt
 .cache
