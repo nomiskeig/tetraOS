@@ -1,6 +1,7 @@
 #pragma once
 
 // Implemented according to https://www.nongnu.org/ext2-doc/ext2.html
+#include "kernel/libk/kstdio.h"
 #include <tlib/stdint.h>
 #include <kernel/drivers/virtio/blk.h>
 class EXT2SuperBlock {
@@ -30,6 +31,9 @@ public:
     uint32_t s_rev_level;
     uint16_t s_def_resuid;
     uint16_t s_def_resgid;
+    // -- EXT2_DYNAMIC_REV Specific --
+    uint32_t s_first_ino;
+    uint16_t s_inode_size;
     // TODO: add the rest of the fields
 };
 
@@ -45,7 +49,8 @@ public:
     uint8_t bg_reserved[12];
 };
 
-class EXT2InodeTable {
+class EXT2Inode {
+public:
     uint16_t i_mode;
     uint16_t i_uid;
     uint32_t i_size;
@@ -64,8 +69,26 @@ class EXT2InodeTable {
     uint32_t i_dir_acl;
     uint32_t i_faddr;
     uint8_t i_osd2[12];
+    uint8_t i_unused[128];
 };
 
 
-void ext2_init(VirtIOBlockDevice* block_device);
-void ext2_read_file(char* name);
+struct EXT2LinkedListDirectory {
+    uint32_t inode;
+    uint16_t rec_len;
+    uint8_t name_len;
+    uint8_t file_type;
+    char name[255];
+};
+
+class EXT2 {
+private:
+    VirtIOBlockDevice * block_device;
+    EXT2SuperBlock* super_block;
+    uint32_t block_size;
+public:
+    EXT2(VirtIOBlockDevice * block_device);
+    void read_file(const char* path);
+};
+
+

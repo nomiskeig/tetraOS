@@ -11,6 +11,7 @@ enum LogLevel {
     SYSTEM = 16,
     ERROR = 32,
     VIRTIO = 64,
+    WARNING = 128,
 
 };
 void printf(char const *fmt, ...);

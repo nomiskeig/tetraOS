@@ -29,9 +29,6 @@ int VirtIOBlockDevice::init() {
     uint32_t device_features = this->registers->device_features;
     this->registers->device_features_sel = 0x1;
     uint32_t device_features2 = this->registers->device_features;
-    printf("device features: 0x%x\n", device_features);
-    printf("device features 2: 0x%x\n", device_features2);
-    printf("VIRTIO_F_NOTIFICATION_DATA: 0x%x\n", device_features2 >> 6 & 0x1);
 
     this->registers->driver_features_sel = 0x0;
     this->registers->driver_features = device_features;
@@ -103,10 +100,6 @@ int VirtIOBlockDevice::init() {
     this->config->writeback = 0x0;
     uint64_t device_size = this->config->capacity;
     uint16_t amount_queues = this->config->num_queues;
-    printf("capacity: 0x%x\n", device_size);
-    printf("blk size: 0x%x\n", this->config->blk_size);
-    printf("amount queues: %i\n", amount_queues);
-    printf("queue size: 0x%x\n", this->registers->queue_num_max);
 
     // notfiy the device about the regions
     // 8. Set the DRIVER_OK status bit. At this point the device is “live”.
@@ -119,22 +112,17 @@ int VirtIOBlockDevice::init() {
  * Read length bytes starting at the offset into buffer.
  */
 int VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
+    log(LogLevel::VIRTIO, "Reading %i bytes from offset 0x%x", length, offset);
     uint64_t sector = offset / 512;
     uint64_t too_much_at_start = offset % 512;
     uint64_t amount = length / 512;
     uint64_t rest = length % 512;
     char *temp_buffer = (char *)kalloc(512 * (amount + 1));
+    log(LogLevel::WARNING, "Temp buffer in VirtIOBlockDevice::read should be freed!");
     int res = this->read_blocks(sector, (amount + 1) * 512, temp_buffer);
     if (res < 0) {
         return res;
     }
- /*   printf("too much at start: %i", too_much_at_start);
-    for (size_t i = 0; i < 512 / 8; i++) {
-        printf("temp_buff: 0x%x\n", 
-               *((uint64_t *)(temp_buffer + too_much_at_start) + i));
-               }
-    }
-    */
     memcpy(buffer, temp_buffer + too_much_at_start, length);
     // TODO: this seems to cut of the end of the starting word instead of the beginning.
     // I do not know if that is correct and i am just thinking about it wrong or if its broken.
@@ -199,9 +187,7 @@ int VirtIOBlockDevice::basic_op(uint64_t sector, uint64_t length, char *buffer,
     this->queue->avail.idx += 1;
     memory_barrier();
     this->registers->queue_notify = 0x0;
-    printf("read\n");
     while (request->status.status == 0x12) {
-        printf("status: 0x%x\n", request->status.status);
     }
     return 0;
 }
@@ -216,7 +202,6 @@ VirtIOBlockDevice *get_block_device() {
             *(((uint32_t *)address) + 1) == 0x2) {
             if (*((uint32_t *)(address + 0x008)) == 0x2) {
 
-                printf("found block device at 0x%x\n", address);
                 VirtIOBlockDevice *device =
                     (VirtIOBlockDevice *)kalloc(sizeof(VirtIOBlockDevice));
                 block_device = device;
@@ -225,7 +210,6 @@ VirtIOBlockDevice *get_block_device() {
                     (VirtIOBlockDeviceConfig *)(address + 0x100));
                 return block_device;
             }
-            printf("found at 0x%x\n", address);
         }
     }
     return 0x0;

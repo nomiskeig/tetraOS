@@ -1,17 +1,15 @@
-#include <kernel/libk/kstdio.h> 
-#include <kernel/libk/list.h> 
-#include <kernel/UART.h> 
+#include <kernel/UART.h>
+#include <kernel/libk/kstdio.h>
+#include <kernel/libk/list.h>
 #include <tlib/stdarg.h>
 
-
-void printf(char const* fmt, ...) {
+void printf(char const *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
     va_end(args);
-
 }
-//void AllocItem::set_start_address(void* address) {}
+// void AllocItem::set_start_address(void* address) {}
 void vprintf(char const *fmt, va_list args) {
     while (*fmt) {
         if (*fmt == '%') {
@@ -52,6 +50,20 @@ void vprintf(char const *fmt, va_list args) {
                     put_char(chars[index] + offset);
                     index -= 1;
                 }
+                fmt++;
+            } else if (*fmt == 'x') {
+                // TODO: this does not work i think, at least it is not tested
+                char *chars = va_arg(args, char *);
+                int current = 0;
+                while (chars[current] != '\0') {
+                    put_char(chars[current]);
+                    current++;
+                }
+                fmt++;
+
+            } else if (*fmt == 'c') {
+                char c = va_arg(args, int);
+                put_char(c);
                 fmt++;
             }
 

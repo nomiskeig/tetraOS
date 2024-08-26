@@ -31,6 +31,9 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::VIRTIO:
         prefix = "[VIRTIO]";
         break;
+    case LogLevel::WARNING:
+        prefix = "\u001b[33m[WARN]\u001b[37m";
+        break;
     }
     printf(prefix);
     printf(" ");
