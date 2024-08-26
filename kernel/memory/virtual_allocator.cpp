@@ -80,8 +80,8 @@ void *kalloc(uint64_t size) {
         is_first = false;
         current = current->get_next();
     };
-    if (current->is_last() && current->get_size() < size) {
-        while (current->get_size() < size) {
+    if (current->is_last() && current->get_size() < size + sizeof(FreeSpace) *2) {
+        while (current->get_size() < size + sizeof(FreeSpace) *2) {
 
         PhysicalFrame* new_frame = (PhysicalFrame*)kalloc_frame();
         map_page((VirtualPage*)virtual_alloc_end, new_frame);
@@ -89,6 +89,7 @@ void *kalloc(uint64_t size) {
         virtual_alloc_end += PAGE_SIZE;
         }
     }
+
     // TODO: case where item is the last item and theres not enough space, in
     // that case we allocate a new page
 
@@ -100,7 +101,7 @@ void *kalloc(uint64_t size) {
     void *result_pointer = address + 2;
     FreeSpace *new_free_list = (FreeSpace *)((uint8_t *)result_pointer + size);
     new_free_list->set_last();
-    new_free_list->set_size(old_size - size);
+    new_free_list->set_size(old_size - (size + 16));
     free_list = new_free_list;
     log(LogLevel::VIRTUAL_MEMORY, "Allocated %i bytes at 0x%x", size,
         result_pointer);
