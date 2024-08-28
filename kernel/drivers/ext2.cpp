@@ -15,19 +15,26 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
     block_device->read(1024, sizeof(EXT2SuperBlock), (char *)super_block);
     int amount_groups = this->super_block->s_blocks_count /
                         this->super_block->s_blocks_per_group;
-    printf("amount of groups: %i\n", amount_groups);
+    this->group_descs = new EXT2BlockGroupDescriptor*[8];
     this->block_size = 1024 << super_block->s_log_block_size;
+    for (size_t i = 0; i < amount_groups; i++) {
+
+        this->group_descs[i] = new EXT2BlockGroupDescriptor();
+    }
+    for (size_t i = 0; i < amount_groups; i++) {
+
+    this->block_device->read(this->block_size * 1 + i*sizeof(EXT2BlockGroupDescriptor),
+                             sizeof(EXT2BlockGroupDescriptor), (char*)this->group_descs[i]);
+    }
     this->inodes_per_block = this->block_size / this->super_block->s_inode_size;
 
-    printf("inodes per gourp: %i", this->super_block->s_inodes_per_group);
-    printf("inodes per block: %i" ,this->inodes_per_block);
 }
 int EXT2::get_inode(EXT2Inode *start_dir, EXT2BlockGroupDescriptor *desc,
                     const char *name) {
     log(LogLevel::FS, "Getting inode of dir %s", name);
     if ((start_dir->i_mode & 0x4000) == 0x0) {
         log(LogLevel::ERROR, "get_inode can only be called on directories");
-        // return -1;
+         return -1;
     }
     // assume that start_dir is already read from disc
     // TODO: free this we do not need it anymore as the inode is copied over (i
@@ -40,38 +47,28 @@ int EXT2::get_inode(EXT2Inode *start_dir, EXT2BlockGroupDescriptor *desc,
     EXT2LinkedListDirectory *dir_entry =
         (EXT2LinkedListDirectory *)(data + current_offset);
     while (!dir_entry->matches(name)) {
-        // printf("did not match\n");
         current_offset += dir_entry->rec_len;
         dir_entry = (EXT2LinkedListDirectory *)(data + current_offset);
     }
     // TODO: this breaks if entry cannot be found
 
-    printf("matched! inode: %i\n", dir_entry->inode);
-
     // TODO: this does not work, it calculates the offset wrong i think
+
+    uint32_t desc_index =  (dir_entry->inode-1)/this->super_block->s_inodes_per_group;
     this->block_device->read(
         this->block_size *
-                (desc->bg_inode_table + dir_entry->inode / this->inodes_per_block) +
+        // TODO: the commented out code has to calculate the index of the block on which the inode were looking for is stored
+                (group_descs[desc_index]->bg_inode_table /* + (dir_entry->inode-1) / this->inodes_per_block*/) +
             sizeof(EXT2Inode) * ((dir_entry->inode -1) % this->inodes_per_block),
         sizeof(EXT2Inode), (char *)start_dir);
-    printf("start dir mode: 0x%x\n", start_dir->i_mode);
     return 0;
 }
 
 int EXT2::read_file(const char *name) {
-    printf("reading file: ");
-    size_t o = 0;
-    while (name[o] != '\0') {
-        printf("%c", name[o]);
-        o++;
-    };
-    printf("\n");
+    log(LogLevel::FS, "Reading file: %s", name);
 
-    EXT2BlockGroupDescriptor *desc = new EXT2BlockGroupDescriptor();
-    this->block_device->read(this->block_size * 1,
-                             sizeof(EXT2BlockGroupDescriptor), (char *)desc);
     EXT2Inode *current_inode = new EXT2Inode();
-    this->block_device->read(this->block_size * desc->bg_inode_table +
+    this->block_device->read(this->block_size * group_descs[0]->bg_inode_table +
                                  sizeof(EXT2Inode) * 1,
                              sizeof(EXT2Inode), (char *)current_inode);
     size_t current = 0;
@@ -81,14 +78,11 @@ int EXT2::read_file(const char *name) {
             current++;
             // found a folder
             char *folder_name = (char *)kalloc(sizeof(char) * (size + 1));
-            printf("folder name: ");
             for (size_t i = 0; i < size; i++) {
                 folder_name[i] = name[current - size + i - 1];
-                printf("%c", folder_name[i]);
             }
             folder_name[size] = '\0';
-            printf("\n");
-            this->get_inode(current_inode, desc, folder_name);
+            this->get_inode(current_inode, group_descs[0], folder_name);
             size = 0;
         }
         current++;
@@ -103,7 +97,7 @@ int EXT2::read_file(const char *name) {
         file_name[i] = name[current - size + i];
     }
     file_name[size] = '\0';
-    this->get_inode(current_inode, desc, file_name);
+    this->get_inode(current_inode, group_descs[0], file_name);
     char *data = (char *)kalloc(this->block_size);
 
     this->block_device->read(this->block_size * current_inode->i_block[0],

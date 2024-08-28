@@ -7,34 +7,31 @@ extern uint64_t VIRTUAL_HEAP_START;
 static FreeSpace *free_list;
 static uint64_t virtual_alloc_end;
 
-void *operator new(size_t size) {
-    return kalloc(size);
-}
-void operator delete(void *p)  {
+void *operator new(size_t size) { return kalloc(size); }
+void *operator new[](size_t size) { return kalloc(size); }
+void operator delete(void *p) {
     log(LogLevel::ERROR, "Unimplemented call to delete operator");
-    //kfree(p);
+    // kfree(p);
 }
-extern "C" void *memset(void* s, int c, size_t n) {
-    char * i  =(char*)s;
+extern "C" void *memset(void *s, int c, size_t n) {
+    char *i = (char *)s;
     uint64_t counter = 0;
     while (counter < n) {
         *i = c;
         i++;
         counter++;
-
     }
     return s;
-
-}extern "C" void* memcpy(void *dest, const void *src, size_t len) {
-    char* dest_char = (char*)dest;
-    char* src_char = (char*)src;
+}
+extern "C" void *memcpy(void *dest, const void *src, size_t len) {
+    char *dest_char = (char *)dest;
+    char *src_char = (char *)src;
     size_t current = 0;
     while (current < len) {
         dest_char[current] = src_char[current];
         current++;
     }
     return dest;
-
 }
 
 void virtual_allocator_init() {
@@ -56,7 +53,8 @@ void virtual_allocator_init() {
     free_list = first_item;
     virtual_alloc_end = VIRTUAL_HEAP_START + PAGE_SIZE;
 
-    log(LogLevel::VIRTUAL_MEMORY, "Virtual alloc end: 0x%x\n", virtual_alloc_end);
+    log(LogLevel::VIRTUAL_MEMORY, "Virtual alloc end: 0x%x\n",
+        virtual_alloc_end);
     log(LogLevel::VIRTUAL_MEMORY, "Initialization of virtual allocator done");
 }
 
@@ -80,13 +78,14 @@ void *kalloc(uint64_t size) {
         is_first = false;
         current = current->get_next();
     };
-    if (current->is_last() && current->get_size() < size + sizeof(FreeSpace) *2) {
-        while (current->get_size() < size + sizeof(FreeSpace) *2) {
+    if (current->is_last() &&
+        current->get_size() < size + sizeof(FreeSpace) * 2) {
+        while (current->get_size() < size + sizeof(FreeSpace) * 2) {
 
-        PhysicalFrame* new_frame = (PhysicalFrame*)kalloc_frame();
-        map_page((VirtualPage*)virtual_alloc_end, new_frame);
-        current->set_size(current->get_size() + PAGE_SIZE);
-        virtual_alloc_end += PAGE_SIZE;
+            PhysicalFrame *new_frame = (PhysicalFrame *)kalloc_frame();
+            map_page((VirtualPage *)virtual_alloc_end, new_frame);
+            current->set_size(current->get_size() + PAGE_SIZE);
+            virtual_alloc_end += PAGE_SIZE;
         }
     }
 

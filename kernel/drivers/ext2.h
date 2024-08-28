@@ -88,6 +88,7 @@ private:
     EXT2SuperBlock* super_block;
     uint32_t block_size;
     uint32_t inodes_per_block;
+    EXT2BlockGroupDescriptor** group_descs;
     int get_inode(EXT2Inode* start_dir,  EXT2BlockGroupDescriptor* desc, const char* path);
 public:
     EXT2(VirtIOBlockDevice * block_device);
