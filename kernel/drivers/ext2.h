@@ -16,7 +16,7 @@ public:
     uint32_t s_log_frag_size;
     uint32_t s_blocks_per_group;
     uint32_t s_frags_per_group;
-    uint32_t s_indodes_per_group;
+    uint32_t s_inodes_per_group;
     uint32_t s_mtime;
     uint32_t s_wtime;
     uint16_t s_mnt_count;
@@ -79,6 +79,7 @@ struct EXT2LinkedListDirectory {
     uint8_t name_len;
     uint8_t file_type;
     char name[255];
+    bool matches(const char* other_name);
 };
 
 class EXT2 {
@@ -86,9 +87,11 @@ private:
     VirtIOBlockDevice * block_device;
     EXT2SuperBlock* super_block;
     uint32_t block_size;
+    uint32_t inodes_per_block;
+    int get_inode(EXT2Inode* start_dir,  EXT2BlockGroupDescriptor* desc, const char* path);
 public:
     EXT2(VirtIOBlockDevice * block_device);
-    void read_file(const char* path);
+    int read_file(const char* path);
 };
 
 

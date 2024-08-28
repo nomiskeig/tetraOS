@@ -8,7 +8,7 @@
 extern "C" int os_start(void) {
     uart_init();
     set_log_level(LogLevel::PAGING | LogLevel::SYSTEM |
-                  LogLevel::VIRTUAL_MEMORY | LogLevel::ERROR | LogLevel::WARNING | LogLevel::VIRTIO);
+                  LogLevel::VIRTUAL_MEMORY | LogLevel::ERROR | LogLevel::WARNING | LogLevel::VIRTIO |LogLevel::FS);
     log(LogLevel::SYSTEM, "Booted to OS");
     physical_allocator_init();
     paging_init();
@@ -18,8 +18,9 @@ extern "C" int os_start(void) {
 
     VirtIOBlockDevice* block_device = get_block_device();
     block_device->init();
-    EXT2* ext2 = new EXT2(block_device);
+    EXT2* ext2 = new  EXT2(block_device);
     ext2->read_file("testfile.txt");
+    ext2->read_file("folder1/folder2/folder3/file.txt");
 
     return 0;
 }

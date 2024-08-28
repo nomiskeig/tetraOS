@@ -34,6 +34,9 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::WARNING:
         prefix = "\u001b[33m[WARN]\u001b[37m";
         break;
+    case LogLevel::FS:
+        prefix= "[FS]";
+        break;
     }
     printf(prefix);
     printf(" ");

@@ -51,7 +51,7 @@ void vprintf(char const *fmt, va_list args) {
                     index -= 1;
                 }
                 fmt++;
-            } else if (*fmt == 'x') {
+            } else if (*fmt == 's') {
                 // TODO: this does not work i think, at least it is not tested
                 char *chars = va_arg(args, char *);
                 int current = 0;
