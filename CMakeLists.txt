@@ -6,3 +6,10 @@ add_link_options(-nostdlib -fno-builtin -mcmodel=medany -march=rv64imad_zicsr -m
 project(TetraOS VERSION 1.0 LANGUAGES CXX ASM)
 
 add_subdirectory(kernel)
+add_custom_target(qemu)
+add_custom_command(
+    TARGET qemu
+    POST_BUILD
+    COMMAND qemu-system-riscv64 -machine virt -nographic -kernel build/kernel -bios none -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,scsi=off,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false
+)
+

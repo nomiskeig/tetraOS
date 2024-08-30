@@ -48,7 +48,6 @@ void virtual_allocator_init() {
     map_page(page, frame);
     FreeSpace *first_item = (FreeSpace *)(page->get_address());
     first_item->set_size(PAGE_SIZE);
-    printf("first item size: 0x%x\n", first_item->get_size());
     first_item->set_last();
     free_list = first_item;
     virtual_alloc_end = VIRTUAL_HEAP_START + PAGE_SIZE;

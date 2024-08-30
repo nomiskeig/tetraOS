@@ -113,6 +113,8 @@ int VirtIOBlockDevice::init() {
  */
 int VirtIOBlockDevice::read(uint64_t offset, uint64_t length, char *buffer) {
     log(LogLevel::VIRTIO, "Reading %i bytes from offset 0x%x", length, offset);
+    // add to offset because the partition starts at block 2048
+    offset = offset + 512 * 2048;
     uint64_t sector = offset / 512;
     uint64_t too_much_at_start = offset % 512;
     uint64_t amount = length / 512;
@@ -192,9 +194,7 @@ int VirtIOBlockDevice::basic_op(uint64_t sector, uint64_t length, char *buffer,
     return 0;
 }
 VirtIOBlockDevice *get_block_device() {
-    if (block_device != 0x0) {
-        return block_device;
-    }
+    // TODO: return the same pointer if called the second time
     for (uint64_t address = VIRTIO_START;
          address < VIRTIO_START + VIRTIO_AMOUNT * VIRTIO_SIZE;
          address += VIRTIO_SIZE) {

@@ -7,16 +7,18 @@
 
 extern "C" int os_start(void) {
     uart_init();
-    set_log_level(  LogLevel::SYSTEM | LogLevel::ERROR |
+    set_log_level(   LogLevel::SYSTEM | LogLevel::ERROR |
                   LogLevel::WARNING | LogLevel::VIRTIO | LogLevel::FS);
     log(LogLevel::SYSTEM, "Booted to OS");
     physical_allocator_init();
     paging_init();
     virtual_allocator_init();
-    char *first = (char *)kalloc(4);
-    *first = 0x1;
 
     VirtIOBlockDevice *block_device = get_block_device();
+    if (block_device == 0x0) {
+        log(LogLevel::ERROR, "Did not find a block device.");
+        return -1;
+    }
     block_device->init();
     EXT2 *ext2 = new EXT2(block_device);
     ext2->read_file("testfile.txt");

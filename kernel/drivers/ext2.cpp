@@ -18,7 +18,6 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
     this->group_descs = new EXT2BlockGroupDescriptor*[8];
     this->block_size = 1024 << super_block->s_log_block_size;
     for (size_t i = 0; i < amount_groups; i++) {
-
         this->group_descs[i] = new EXT2BlockGroupDescriptor();
     }
     for (size_t i = 0; i < amount_groups; i++) {
@@ -46,9 +45,15 @@ int EXT2::get_inode(EXT2Inode *start_dir, EXT2BlockGroupDescriptor *desc,
     uint64_t current_offset = 0;
     EXT2LinkedListDirectory *dir_entry =
         (EXT2LinkedListDirectory *)(data + current_offset);
-    while (!dir_entry->matches(name)) {
+    size_t counter = 0;
+    while (!dir_entry->matches(name) && counter < 10) {
         current_offset += dir_entry->rec_len;
         dir_entry = (EXT2LinkedListDirectory *)(data + current_offset);
+        counter++;
+    }
+    if (counter == 10) {
+        log(LogLevel::ERROR, "Could not find the file %s.", name);
+        return -1;
     }
     // TODO: this breaks if entry cannot be found
 
@@ -82,7 +87,10 @@ int EXT2::read_file(const char *name) {
                 folder_name[i] = name[current - size + i - 1];
             }
             folder_name[size] = '\0';
-            this->get_inode(current_inode, group_descs[0], folder_name);
+            int res = this->get_inode(current_inode, group_descs[0], folder_name);
+            if (res < 0) {
+                return res;
+            }
             size = 0;
         }
         current++;
@@ -97,7 +105,10 @@ int EXT2::read_file(const char *name) {
         file_name[i] = name[current - size + i];
     }
     file_name[size] = '\0';
-    this->get_inode(current_inode, group_descs[0], file_name);
+    int res = this->get_inode(current_inode, group_descs[0], file_name);
+    if (res < 0) {
+        return res;
+    }
     char *data = (char *)kalloc(this->block_size);
 
     this->block_device->read(this->block_size * current_inode->i_block[0],
