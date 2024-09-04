@@ -1,0 +1,88 @@
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 6553aac1e99..1d316201c7d 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -1247,6 +1247,11 @@ case "${targ}" in
+     targ_selvecs="riscv_elf32_vec riscv_elf64_vec riscv_elf32_be_vec riscv_elf64_be_vec riscv64_pei_vec"
+     want64=true
+     ;;
++  riscv64*-*-tetraos)
++    targ_defvec=riscv_elf64_vec
++    targ_selvecs="riscv_elf32_vec riscv_elf64_vec riscv_elf32_be_vec riscv_elf64_be_vec riscv64_pei_vec"
++    want64=true
++    ;;
+ #endif
+ 
+   rl78-*-elf)
+diff --git a/config.sub b/config.sub
+index 2c6a07ab3c3..71088b04cf4 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1768,7 +1768,7 @@ case $os in
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* | mlibc* | cos* | mbr* | ironclad* )
++	     | fiwix* | mlibc* | cos* | mbr* | ironclad* | tetraos*)
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index d58f21873a3..f15dd48fc8a 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -375,6 +375,7 @@ case ${generic_target} in
+   pru-*-*)				fmt=elf ;;
+ 
+   riscv*-*-haiku*)			fmt=elf endian=little em=haiku ;;
++  riscv64-*-tetraos*)			fmt=elf endian=little em=linux ;;
+   riscv*-*-*)				fmt=elf ;;
+ 
+   rx-*-linux*)				fmt=elf em=linux ;;
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index 6a9833e5775..b6dc65de58f 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -438,6 +438,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf64bmip.c \
+ 	eelf64bpf.c \
+ 	eelf64briscv.c \
++	eelf_riscv64_tetraos.c \
+ 	eelf64briscv_lp64.c \
+ 	eelf64briscv_lp64f.c \
+ 	eelf64btsmip.c \
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 8639e782cdf..dd87e0ce446 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -948,6 +948,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf64bmip.c \
+ 	eelf64bpf.c \
+ 	eelf64briscv.c \
++	eelf_riscv64_tetraos.c \
+ 	eelf64briscv_lp64.c \
+ 	eelf64briscv_lp64f.c \
+ 	eelf64btsmip.c \
+@@ -1486,6 +1487,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_vxworks.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_iamcu.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_riscv64_tetraos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_s390.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 74ddac49863..5e4bb23de20 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -841,6 +841,10 @@ riscv64be*-*-*)		targ_emul=elf64briscv
+ 			targ_extra_emuls="elf32briscv elf64lriscv elf32lriscv"
+ 			targ_extra_libpath=$targ_extra_emuls
+ 			;;
++riscv64*-*-tetraos*)	targ_emul=elf_riscv64_tetraos
++			targ_extra_emuls="elf32lriscv elf64briscv elf32briscv"
++			targ_extra_libpath=$targ_extra_emuls
++			;;
+ riscv64*-*-*)		targ_emul=elf64lriscv
+ 			targ_extra_emuls="elf32lriscv elf64briscv elf32briscv"
+ 			targ_extra_libpath=$targ_extra_emuls
