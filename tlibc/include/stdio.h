@@ -6,10 +6,9 @@
 
 #define SEEK_SET 0
 typedef struct __file FILE;
-FILE *stderr;
 #define __UINTPTR_TYPE__ unsigned long int
 #define __INTPTR_TYPE__ long int
-
+#define stderr FILE*
 int fclose(FILE *stream);
 FILE *fopen();
 int fflush(FILE *stream);
