@@ -21,8 +21,12 @@ extern "C" int os_start(void) {
     }
     block_device->init();
     EXT2 *ext2 = new EXT2(block_device);
-    ext2->read_file("testfile.txt");
-    ext2->read_file("folder1/folder2/folder3/file.txt");
+    size_t testfile_size = ext2->get_file_size("testfile.txt");
+    char* buffer1 = (char*)kalloc(testfile_size);
+    ext2->read_file("testfile.txt", testfile_size, buffer1);
+    for (size_t i = 0; i < testfile_size; i++) {
+        printf("%c", *(buffer1 + i));
+    }
 
     return 0;
 }

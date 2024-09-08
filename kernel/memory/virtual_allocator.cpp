@@ -9,8 +9,13 @@ static uint64_t virtual_alloc_end;
 
 void *operator new(size_t size) { return kalloc(size); }
 void *operator new[](size_t size) { return kalloc(size); }
+void operator delete[](void *) {}
 void operator delete(void *p) {
     log(LogLevel::ERROR, "Unimplemented call to delete operator");
+    // kfree(p);
+}
+void operator delete(void *p, unsigned long size) {
+    log(LogLevel::ERROR, "Unimplemented call to delete operator with size %i", size);
     // kfree(p);
 }
 extern "C" void *memset(void *s, int c, size_t n) {

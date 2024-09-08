@@ -2,8 +2,8 @@
 
 // Implemented according to https://www.nongnu.org/ext2-doc/ext2.html
 #include "kernel/libk/kstdio.h"
-#include <tlib/stdint.h>
 #include <kernel/drivers/virtio/blk.h>
+#include <tlib/stdint.h>
 class EXT2SuperBlock {
 public:
     uint32_t s_inodes_count;
@@ -72,27 +72,27 @@ public:
     uint8_t i_unused[128];
 };
 
-
 struct EXT2LinkedListDirectory {
     uint32_t inode;
     uint16_t rec_len;
     uint8_t name_len;
     uint8_t file_type;
     char name[255];
-    bool matches(const char* other_name);
+    bool matches(const char *other_name);
 };
 
 class EXT2 {
 private:
-    VirtIOBlockDevice * block_device;
-    EXT2SuperBlock* super_block;
+    VirtIOBlockDevice *block_device;
+    EXT2SuperBlock *super_block;
     uint32_t block_size;
     uint32_t inodes_per_block;
-    EXT2BlockGroupDescriptor** group_descs;
-    int get_inode(EXT2Inode* start_dir,  EXT2BlockGroupDescriptor* desc, const char* path);
+    EXT2BlockGroupDescriptor **group_descs;
+    int get_inode_in_dir(EXT2Inode *dir, const char *name);
+    int get_inode_from_dir(EXT2Inode *dir, const char* path);
+
 public:
-    EXT2(VirtIOBlockDevice * block_device);
-    int read_file(const char* path);
+    EXT2(VirtIOBlockDevice *block_device);
+    size_t get_file_size(const char *path);
+    int read_file(const char *path, size_t size, char* data);
 };
-
-
