@@ -5,9 +5,20 @@ sudo losetup -P /dev/loop0 data
 # mount the partition 
 sudo mount /dev/loop0p1 datafs
 
+./clean_root_fs.sh
+## tlbic
+cp -r tlibc/include/* rootFS/usr/include
+
+
+## assemble crt0.s
+riscv64-tetraos-as tlibc/crt0.s -o rootFS/usr/lib/crt0.o
+
+tlibc/compile_and_build_tlibc.sh
+userspace/compile_and_build_userspace.sh
 
 ## copy the contents from rootFS to the mounted device
 cp -a rootFS/. datafs
+
 # build the kernel
 make kernel
 
