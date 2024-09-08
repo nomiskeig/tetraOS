@@ -89,10 +89,13 @@ private:
     uint32_t inodes_per_block;
     EXT2BlockGroupDescriptor **group_descs;
     int get_inode_in_dir(EXT2Inode *dir, const char *name);
-    int get_inode_from_dir(EXT2Inode *dir, const char* path);
+    int get_inode_from_dir(EXT2Inode *dir, const char *path);
 
 public:
     EXT2(VirtIOBlockDevice *block_device);
+    static EXT2 * get_instance();
     size_t get_file_size(const char *path);
-    int read_file(const char *path, size_t size, char* data);
+    int read_file(const char *path, size_t size, char *data);
 };
+size_t get_file_size(const char *path);
+int read_file(const char *path, size_t size, char *data);

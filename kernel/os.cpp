@@ -3,6 +3,7 @@
 #include <kernel/drivers/virtio/blk.h>
 #include <kernel/libk/kstdio.h>
 #include <kernel/memory.h>
+#include <kernel/drivers/ext2.h>
 #include <kernel/os.h>
 
 extern "C" int os_start(void) {
@@ -21,9 +22,9 @@ extern "C" int os_start(void) {
     }
     block_device->init();
     EXT2 *ext2 = new EXT2(block_device);
-    size_t testfile_size = ext2->get_file_size("testfile.txt");
+    size_t testfile_size = get_file_size("testfile.txt");
     char* buffer1 = (char*)kalloc(testfile_size);
-    ext2->read_file("testfile.txt", testfile_size, buffer1);
+    read_file("testfile.txt", testfile_size, buffer1);
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }

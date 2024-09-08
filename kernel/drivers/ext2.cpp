@@ -2,6 +2,7 @@
 #include <kernel/drivers/virtio/blk.h>
 #include <kernel/libk/kstdio.h>
 
+static EXT2* instance;
 void print_entry_name(EXT2LinkedListDirectory *entry) {
     printf("Entry name: ");
     for (size_t i = 0; i < entry->name_len; i++) {
@@ -27,6 +28,7 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
             sizeof(EXT2BlockGroupDescriptor), (char *)this->group_descs[i]);
     }
     this->inodes_per_block = this->block_size / this->super_block->s_inode_size;
+    instance = this;
 }
 /*
  * Replaces the provided inode with the contents of the searched inode
@@ -156,4 +158,16 @@ int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
         return res;
     }
     return 0;
+}
+EXT2* EXT2::get_instance() {
+    return instance;
+}
+
+
+size_t get_file_size(const char *path) {
+    return EXT2::get_instance()->get_file_size(path);
+
+}
+int read_file(const char* path, size_t size, char* data) {
+    return EXT2::get_instance()->read_file(path, size, data);
 }
