@@ -37,6 +37,9 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::FS:
         prefix= "[FS]";
         break;
+    case LogLevel::PROCESS:
+        prefix= "[PROCESS]";
+        break;
     }
     printf(prefix);
     printf(" ");
