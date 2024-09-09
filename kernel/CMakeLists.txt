@@ -3,10 +3,12 @@ set_target_properties(kernel PROPERTIES RUNTIME_OUTPUT_DIRECTORY /home/simon/dev
 target_link_libraries(kernel PRIVATE libk)
 target_link_libraries(kernel PRIVATE memory)
 target_link_libraries(kernel PRIVATE drivers)
+target_link_libraries(kernel PRIVATE process)
 
 add_subdirectory(libk)
 add_subdirectory(memory)
 add_subdirectory(drivers)
+add_subdirectory(process)
 
 
 add_custom_target(debug)

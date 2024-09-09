@@ -5,11 +5,12 @@
 #include <kernel/memory.h>
 #include <kernel/drivers/ext2.h>
 #include <kernel/os.h>
+#include <kernel/process/scheduler.h>
 
 extern "C" int os_start(void) {
     uart_init();
-    set_log_level(   LogLevel::SYSTEM | LogLevel::ERROR |
-                  LogLevel::WARNING | LogLevel::VIRTIO | LogLevel::FS);
+    set_log_level( LogLevel::PAGING |  LogLevel::SYSTEM | LogLevel::ERROR |
+                  LogLevel::WARNING | LogLevel::VIRTIO | LogLevel::FS | LogLevel::PROCESS);
     log(LogLevel::SYSTEM, "Booted to OS");
     physical_allocator_init();
     paging_init();
@@ -28,6 +29,14 @@ extern "C" int os_start(void) {
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
+    size_t testfile2_size = get_file_size("testfile.txt");
+    char* buffer2 = (char*)kalloc(testfile_size);
+    read_file("folder1/folder2/folder3/file.txt", testfile_size, buffer1);
+    for (size_t i = 0; i < testfile_size; i++) {
+        printf("%c", *(buffer1 + i));
+    }
+    create_and_run_new_process("usr/bin/shell");
+
 
     return 0;
 }
