@@ -1,13 +1,12 @@
-
-mkdir datafs
-# create loopback device for the file
-sudo losetup -P /dev/loop0 data
-# mount the partition 
-sudo mount /dev/loop0p1 datafs
+#!/bin/bash
+set -e
+# build the kernel
+make kernel
 
 ./clean_root_fs.sh
+
 ## tlbic
-cp -r tlibc/include/* rootFS/usr/include
+cp -r tlibc/include/* rootFS/usr/include || true
 
 
 ## assemble crt0.s
@@ -16,11 +15,16 @@ riscv64-tetraos-as tlibc/crt0.s -o rootFS/usr/lib/crt0.o
 tlibc/compile_and_build_tlibc.sh
 userspace/compile_and_build_userspace.sh
 
-## copy the contents from rootFS to the mounted device
-cp -a rootFS/. datafs
+mkdir datafs
+# create loopback device for the file
+sudo losetup -P /dev/loop0 data
+# mount the partition 
+sudo mount /dev/loop0p1 datafs
 
-# build the kernel
-make kernel
+
+## copy the contents from rootFS to the mounted device
+cp -r rootFS/* datafs 
+
 
 # create the binary file
 riscv64-unknown-elf-objcopy -O binary build/kernel build/kernel.bin
