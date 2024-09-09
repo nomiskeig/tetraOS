@@ -2,7 +2,7 @@
 #include <kernel/drivers/virtio/blk.h>
 #include <kernel/libk/kstdio.h>
 
-static EXT2* instance;
+static EXT2 *instance;
 void print_entry_name(EXT2LinkedListDirectory *entry) {
     printf("Entry name: ");
     for (size_t i = 0; i < entry->name_len; i++) {
@@ -37,10 +37,12 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
  * f2
  * */
 int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
-    log(LogLevel::FS, "Getting inode of dir %s", name);
+    log(LogLevel::FS, "Getting inode of dir %s in dir %s", name);
     if ((dir->i_mode & 0x4000) == 0x0) {
         log(LogLevel::ERROR,
-            "get_inode_in_dir can only be called on directories");
+            "get_inode_in_dir can only be called on directories, you called it "
+            "on %s",
+            name);
         return -1;
     }
     // assume that start_dir is already read from disc
@@ -65,28 +67,30 @@ int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
     }
     // TODO: this breaks if entry cannot be found
 
-    // TODO: this does not work, it calculates the offset wrong i think
 
     uint32_t desc_index =
         (dir_entry->inode - 1) / this->super_block->s_inodes_per_group;
-    this->block_device->read(this->block_size *
-                                     // TODO: the commented out code has to
-                                     // calculate the index of the block on
-                                     // which the inode were looking for is
-                                     // stored
-                                     (group_descs[desc_index]->bg_inode_table /* + (dir_entry->inode-1) / this->inodes_per_block*/) +
-                                 sizeof(EXT2Inode) * ((dir_entry->inode - 1) %
-                                                      this->inodes_per_block),
-                             sizeof(EXT2Inode), (char *)dir);
+    uint32_t index =
+        (dir_entry->inode - 1) % this->super_block->s_inodes_per_group;
+    uint32_t containing_block = (index * sizeof(EXT2Inode)) / this->block_size;
+    printf("containing block : %i\n", containing_block);
+    this->block_device->read(
+        this->block_size *
+        // TODO: this is missing offset but i could not figure out how to calculate it
+        // Should replace the + 0 below
+                (group_descs[desc_index]->bg_inode_table + 0) +
+            sizeof(EXT2Inode) * index,
+        sizeof(EXT2Inode), (char *)dir);
     return 0;
 }
 
-size_t EXT2::get_file_size(const char *name) { 
+size_t EXT2::get_file_size(const char *name) {
     EXT2Inode *inode = new EXT2Inode();
     this->block_device->read(this->block_size * group_descs[0]->bg_inode_table +
                                  sizeof(EXT2Inode) * 1,
                              sizeof(EXT2Inode), (char *)inode);
     get_inode_from_dir(inode, name);
+    // TODO: free inode
     return inode->i_size;
 }
 
@@ -159,15 +163,11 @@ int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
     }
     return 0;
 }
-EXT2* EXT2::get_instance() {
-    return instance;
-}
-
+EXT2 *EXT2::get_instance() { return instance; }
 
 size_t get_file_size(const char *path) {
     return EXT2::get_instance()->get_file_size(path);
-
 }
-int read_file(const char* path, size_t size, char* data) {
+int read_file(const char *path, size_t size, char *data) {
     return EXT2::get_instance()->read_file(path, size, data);
 }
