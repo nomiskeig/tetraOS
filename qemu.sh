@@ -1,5 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 set -e
+debug='false'
+
+print_usage() {
+    printf "Usage:\n"
+    printf "'-d' Flag activates debug mode"
+}
+# see https://stackoverflow.com/questions/7069682/how-to-get-arguments-with-flags-in-bash
+while getopts 'd' flag; do
+    case "${flag}" in
+        d) debug='true';;
+        *) print_usage
+            exit 1 ;;
+    esac
+done
+
+echo ${debug}
+
 # build the kernel
 make kernel
 
@@ -49,7 +66,11 @@ sudo losetup -d /dev/loop0
 
 rm -rf datafs
 
-qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,scsi=off,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false
+if [[ "$debug" == "true" ]]; then
+    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,scsi=off,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false -s -S
+else 
+    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,scsi=off,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false
+fi
 
 
 
