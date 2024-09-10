@@ -50,7 +50,7 @@ void virtual_allocator_init() {
     VirtualPage *page = (VirtualPage *)VIRTUAL_HEAP_START;
     // we have to operate on the virtual page
 
-    map_page(page, frame);
+    map_page(page, frame, 0xF);
     FreeSpace *first_item = (FreeSpace *)(page->get_address());
     first_item->set_size(PAGE_SIZE);
     first_item->set_last();
@@ -87,7 +87,7 @@ void *kalloc(uint64_t size) {
         while (current->get_size() < size + sizeof(FreeSpace) * 2) {
 
             PhysicalFrame *new_frame = (PhysicalFrame *)kalloc_frame();
-            map_page((VirtualPage *)virtual_alloc_end, new_frame);
+            map_page((VirtualPage *)virtual_alloc_end, new_frame, 0xF);
             current->set_size(current->get_size() + PAGE_SIZE);
             virtual_alloc_end += PAGE_SIZE;
         }

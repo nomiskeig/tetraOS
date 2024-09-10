@@ -58,9 +58,11 @@ void map_page_for_setup(PageTable *first_table, PageTable *second_table,
                            createValidPageTableEntry(frame->get_ppn()) | 0xF);
 }
 
-void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
-    log(LogLevel::PAGING, "Mapping virtual page 0x%x to physical frame 0x%x",
-        virtual_page->get_address(), physical_frame->get_address());
+void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame,
+              uint16_t flag) {
+    log(LogLevel::PAGING,
+        "Mapping virtual page 0x%x to physical frame 0x%x with flags 0x%x",
+        virtual_page->get_address(), physical_frame->get_address(), flag);
 
     // check and map the first level
     uint16_t vpn_3 = virtual_page->get_vpn_3();
@@ -98,7 +100,7 @@ void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame) {
                       VIRTUAL_OFFSET);
     fourth_table->setEntry(
         virtual_page->get_vpn_0(),
-        createValidPageTableEntry(physical_frame->get_ppn()) | 0xF);
+        createValidPageTableEntry(physical_frame->get_ppn()) | flag);
 }
 // Returns the physical address the provided virtual address is mapped to.
 // Retuns a null pointer if the virtual address is not mapped
@@ -150,7 +152,9 @@ void *get_physical_address_of_virtual_address(void *virtual_address) {
         return 0;
     }
     uint64_t offset = virtual_page->get_offset();
-    return ((uint64_t*)((uint64_t)fourth_table->getPhysicalFrame(virtual_page->get_vpn_0()) | offset));
+    return ((uint64_t *)((uint64_t)fourth_table->getPhysicalFrame(
+                             virtual_page->get_vpn_0()) |
+                         offset));
 }
 
 void PageTable::setEntry(uint16_t index, PageTableEntry entry) {
