@@ -9,13 +9,20 @@
 
 extern "C" int os_start(void) {
     uart_init();
-    set_log_level( LogLevel::PAGING |  LogLevel::SYSTEM | LogLevel::ERROR |
+    set_log_level( LogLevel::EXCEPTION | LogLevel::PAGING |  LogLevel::SYSTEM | LogLevel::ERROR |
                   LogLevel::WARNING | LogLevel::VIRTIO | LogLevel::FS | LogLevel::PROCESS);
     log(LogLevel::SYSTEM, "Booted to OS");
+
     physical_allocator_init();
     paging_init();
     virtual_allocator_init();
 
+
+    printf("is before exception\n");
+    uint64_t* address = 0x0;
+    //*address = 'a';
+
+    printf("is after exception\n");
     VirtIOBlockDevice *block_device = get_block_device();
     if (block_device == 0x0) {
         log(LogLevel::ERROR, "Did not find a block device.");
@@ -38,5 +45,7 @@ extern "C" int os_start(void) {
     create_and_run_new_process("usr/bin/shell");
 
 
+
     return 0;
 }
+

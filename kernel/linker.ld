@@ -12,13 +12,9 @@ MEMORY
 SECTIONS {
  
   . = 0x80000000;
-  /*.boot.data : {
-        *(.boot.data)
-    }
   .boot.text : {
         *(.boot.text)
     }
-    */
 
   . += 0xFFFF800000000000;
   .text ALIGN (4k): AT (ADDR (.text) - 0xFFFF800000000000) {

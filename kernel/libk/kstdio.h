@@ -13,7 +13,8 @@ enum LogLevel {
     VIRTIO = 64,
     WARNING = 128,
     FS = 256,
-    PROCESS = 512
+    PROCESS = 512,
+    EXCEPTION = 1024
 
 };
 void printf(char const *fmt, ...);

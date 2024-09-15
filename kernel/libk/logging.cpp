@@ -40,6 +40,9 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::PROCESS:
         prefix= "[PROCESS]";
         break;
+    case LogLevel::EXCEPTION:
+        prefix = "\u001b[31m[EXCEPTION]\u001b[37m";
+        break;
     }
     printf(prefix);
     printf(" ");

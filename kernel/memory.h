@@ -57,7 +57,7 @@ void *kalloc_frame();
 void *kalloc(uint64_t size);
 void kfree_frame(void *);
 void paging_init();
-void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame);
+void map_page(VirtualPage *virtual_page, PhysicalFrame *physical_frame, uint16_t flags);
 void* get_physical_address_of_virtual_address(void * virtual_address);
 void memory_barrier();
 

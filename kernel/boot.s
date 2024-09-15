@@ -2,6 +2,7 @@
 
 .global _start
 .global os_start
+.global machine_exception_handler
 
 .section .bss
 .boot_page_directory:
@@ -20,6 +21,7 @@
 .boot_uart_third_level_table:
     .skip 4096
 
+.section .machine
 
 .section .text
 _start:
@@ -67,8 +69,59 @@ map_next_address:
     j map_next_address;
     
 
+jump_to_machine_exception_handler:
+    # jump to c machine exception handler
+
+    # store mcause in t0 in order to access it in user mode 
+    # TODO: this should be handled better, it will break once we dont want to just die on exceptino
+    csrr t0, mcause
+    # store mtval in t1, this is the address at whihc it faield
+
+# restore the stack pointer of the kernel
+   #csrr sp, sscratch
+    csrr t1, mepc
+    addi a2, zero, 0
+    lui a2, %hi(0x80000000)
+    slli a2, a2, 16
+    la a3, machine_exception_handler
+    add a2, a2, a3
+    csrw mepc, a2
+    mret 
+    
+jump_to_supervisor_exception_handler:
+    # jump to c machine exception handler
+
+    # store mcause in t0 in order to access it in user mode 
+    # TODO: this should be handled better, it will break once we dont want to just die on exceptino
+    csrr t0, scause
+    addi a2, zero, 0
+    lui a2, %hi(0x80000000)
+    slli a2, a2, 16
+    la a3, supervisor_exception_handler
+    j supervisor_exception_handler
+    add a2, a2, a3
+#    csrw sepc, a2
+#    sret 
+
 
 jump_to_c:
+    # enable interrupts
+    # map the addresses
+    # s9 holds the virtual end of the kernel
+    #addi a2, zero, 0
+    #lui a2, %hi(0x80000000)
+    #slli a2, a2, 16
+    la a3, jump_to_machine_exception_handler
+    #add a2, a2, a3
+    csrw mtvec, a3
+    
+    # add exception handler for user mode
+    addi a2, zero, 0
+    lui a2, %hi(0x80000000)
+    slli a2, a2, 16
+    la a3, jump_to_supervisor_exception_handler
+    add a2, a2, a3
+    csrw stvec, a2
     
     # map the UART thingy
     jal boot_uart_map_address

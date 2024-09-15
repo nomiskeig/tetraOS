@@ -2,6 +2,9 @@
 #include <kernel/drivers/ext2.h>
 #include <kernel/memory.h>
 #include <kernel/process/elf.h>
+extern "C" void switch_to_process(long, long);
+extern "C" void set_sum_bit();
+extern "C" void set_spp_zero();
 int create_and_run_new_process(const char *file) {
     log(LogLevel::PROCESS, "Creating process %s", file);
 
@@ -22,6 +25,7 @@ int create_and_run_new_process(const char *file) {
     uint64_t bytes_for_program_headers =
         program_headers_amount * elf_header->e_phentsize;
     printf("program header size: %i\n", elf_header->e_phentsize);
+    set_sum_bit();
     Elf64_Phdr *program_headers =
         (Elf64_Phdr *)(contents + program_headers_offset);
     for (size_t i = 0; i < program_headers_amount; i++) {
@@ -43,14 +47,27 @@ int create_and_run_new_process(const char *file) {
         for (int i = 0; i < amount_pages_to_map; i++) {
             void *physical_frame = kalloc_frame();
             map_page((VirtualPage *)virtual_address_start_address,
-                     (PhysicalFrame *)physical_frame);
+                     (PhysicalFrame *)physical_frame, 0x1F);
         }
+        printf("mapped\n");
         memcpy((void *)(virtual_address_start_address + (vaddr % PAGE_SIZE)),
-               (void *)(contents + program_headers[i].p_offset),
+               (void *)((uint64_t)contents + program_headers[i].p_offset),
                program_headers[i].p_memsz);
+        printf("copied\n");
+    }
+    log(LogLevel::PROCESS, "Jumping to process at address 0x%x", elf_header->e_entry);
+    void * stack_frame = kalloc_frame();
+    uint64_t stack_page = 0x100000;
+    map_page((VirtualPage*)stack_page, (PhysicalFrame*)stack_frame, 0x1F);
+    uint64_t stack_pointer = stack_page + 100;
+    printf("stack pointer: 0x%x", stack_pointer);
+    set_spp_zero();
+    switch_to_process((uint64_t)elf_header->e_entry, stack_pointer);
+    printf("after switch process\n");
+    while(true) {
+       // printf("looping at end, this should not happen as we should be in the process");
     }
 
     
 
-    return 0;
 }
