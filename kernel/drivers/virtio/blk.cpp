@@ -175,7 +175,7 @@ int VirtIOBlockDevice::basic_op(uint64_t sector, uint64_t length, char *buffer,
     this->queue->desc[0].next = 1;
     this->queue->desc[1].addr =
         (uint64_t)get_physical_address_of_virtual_address(buffer);
-    this->queue->desc[1].len = 512;
+    this->queue->desc[1].len = length;
     this->queue->desc[1].next = 2;
     this->queue->desc[1].flags = type == 0x1
                                      ? VIRTQ_DESC_F_NEXT
