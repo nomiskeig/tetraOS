@@ -21,6 +21,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 int feof(FILE *stream);
 int vprintf(const char*format, va_list ap);
 int vfprintf(FILE* stream, const char* format, va_list ap);
+int printf(const char* fmt, ...);
 
 
 #endif

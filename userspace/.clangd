@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-isystem, "/home/simon/dev/tetraOS/rootFS/usr/include/"]
