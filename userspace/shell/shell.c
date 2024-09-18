@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <cet.h>
 
 int main() {
     int a = 0;
