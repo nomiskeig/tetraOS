@@ -51,26 +51,6 @@ index 6a9833e5775..b6dc65de58f 100644
  	eelf64briscv_lp64.c \
  	eelf64briscv_lp64f.c \
  	eelf64btsmip.c \
-diff --git a/ld/Makefile.in b/ld/Makefile.in
-index 8639e782cdf..dd87e0ce446 100644
---- a/ld/Makefile.in
-+++ b/ld/Makefile.in
-@@ -948,6 +948,7 @@ ALL_64_EMULATION_SOURCES = \
- 	eelf64bmip.c \
- 	eelf64bpf.c \
- 	eelf64briscv.c \
-+	eelf_riscv64_tetraos.c \
- 	eelf64briscv_lp64.c \
- 	eelf64briscv_lp64f.c \
- 	eelf64btsmip.c \
-@@ -1486,6 +1487,7 @@ distclean-compile:
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_vxworks.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_iamcu.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_riscv64_tetraos.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_s390.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
 diff --git a/ld/configure.tgt b/ld/configure.tgt
 index 74ddac49863..5e4bb23de20 100644
 --- a/ld/configure.tgt
