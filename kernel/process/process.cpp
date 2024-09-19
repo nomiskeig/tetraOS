@@ -59,7 +59,7 @@ int create_and_run_new_process(const char *file) {
     void * stack_frame = kalloc_frame();
     uint64_t stack_page = 0x100000;
     map_page((VirtualPage*)stack_page, (PhysicalFrame*)stack_frame, 0x1F);
-    uint64_t stack_pointer = stack_page + 100;
+    uint64_t stack_pointer = stack_page + 4000;
     printf("stack pointer: 0x%x", stack_pointer);
     set_spp_zero();
     switch_to_process((uint64_t)elf_header->e_entry, stack_pointer);

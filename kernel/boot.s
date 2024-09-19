@@ -86,6 +86,12 @@ jump_to_machine_exception_handler:
     la a3, machine_exception_handler
     add a2, a2, a3
     csrw mepc, a2
+    # set the MPP bit in mstatus to 1 so we jump to supervisor mode and not to usermode
+    addi a2, zero, 1
+    slli a2, a2, 11
+    csrr a3, mstatus
+    or a2, a3, a2
+    csrw mstatus, a2
     mret 
     
 jump_to_supervisor_exception_handler:

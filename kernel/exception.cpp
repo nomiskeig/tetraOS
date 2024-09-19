@@ -1,5 +1,9 @@
 #include <kernel/libk/kstdio.h>
+#include <kernel/syscalls/syscall.h>
 
+/*
+ * Handles exceptions which trap in to the machine mode handler. We get here from jump_to_machine_exception_handler in boot.s and should be in supervisor mode.
+    */
 extern "C" int machine_exception_handler(void) {
 
     printf("is in machine exception handler\n");
@@ -17,6 +21,9 @@ extern "C" int machine_exception_handler(void) {
         break;
     case 0x2:
         log(LogLevel::EXCEPTION, "Illegal instruction");
+        break;
+    case 0x8:
+        handle_syscall();
         break;
 
     case 0xC:
