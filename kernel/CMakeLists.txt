@@ -1,14 +1,16 @@
-add_executable(kernel boot.s exception.cpp os.cpp UART.cpp UART.h mem.s)
+add_executable(kernel boot.s exception.cpp os.cpp UART.cpp UART.h mem.s processor.h arch/riscv64/processor.cpp)
 set_target_properties(kernel PROPERTIES RUNTIME_OUTPUT_DIRECTORY /home/simon/dev/tetraOS/build/)
 target_link_libraries(kernel PRIVATE libk)
 target_link_libraries(kernel PRIVATE memory)
 target_link_libraries(kernel PRIVATE drivers)
 target_link_libraries(kernel PRIVATE process)
+target_link_libraries(kernel PRIVATE syscalls)
 
 add_subdirectory(libk)
 add_subdirectory(memory)
 add_subdirectory(drivers)
 add_subdirectory(process)
+add_subdirectory(syscalls)
 
 
 add_custom_target(debug)
