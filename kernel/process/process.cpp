@@ -2,7 +2,7 @@
 #include <kernel/drivers/ext2.h>
 #include <kernel/memory.h>
 #include <kernel/process/elf.h>
-extern "C" void switch_to_process(long, long);
+extern "C" void switch_to_process(long, long, long);
 extern "C" void set_sum_bit();
 extern "C" void set_spp_zero();
 int create_and_run_new_process(const char *file) {
@@ -25,9 +25,12 @@ int create_and_run_new_process(const char *file) {
     uint64_t bytes_for_program_headers =
         program_headers_amount * elf_header->e_phentsize;
     printf("program header size: %i\n", elf_header->e_phentsize);
-    set_sum_bit();
+    set_sum_bit(); // allows accessing user pages from supervisor mode
+    
+    printf("test");
     Elf64_Phdr *program_headers =
         (Elf64_Phdr *)(contents + program_headers_offset);
+    uint64_t data_end = 0x0;
     for (size_t i = 0; i < program_headers_amount; i++) {
         // check if we have to load the segment
         if (program_headers[i].p_type != 0x1) {
@@ -52,9 +55,14 @@ int create_and_run_new_process(const char *file) {
         printf("mapped\n");
         memcpy((void *)(virtual_address_start_address + (vaddr % PAGE_SIZE)),
                (void *)((uint64_t)contents + program_headers[i].p_offset),
-               program_headers[i].p_memsz);
+               program_headers[i].p_filesz);
+        if (data_end < (program_headers[i].p_vaddr  + program_headers[i].p_memsz)) {
+            data_end = program_headers[i].p_vaddr  + program_headers[i].p_memsz;
+        }
         printf("copied\n");
     }
+    printf("is here\n");
+    printf("data end: 0x%x\n", data_end);
     log(LogLevel::PROCESS, "Jumping to process at address 0x%x", elf_header->e_entry);
     void * stack_frame = kalloc_frame();
     uint64_t stack_page = 0x100000;
@@ -62,7 +70,7 @@ int create_and_run_new_process(const char *file) {
     uint64_t stack_pointer = stack_page + 4000;
     printf("stack pointer: 0x%x", stack_pointer);
     set_spp_zero();
-    switch_to_process((uint64_t)elf_header->e_entry, stack_pointer);
+    switch_to_process((uint64_t)elf_header->e_entry, stack_pointer, data_end + 20);
     printf("after switch process\n");
     while(true) {
        // printf("looping at end, this should not happen as we should be in the process");

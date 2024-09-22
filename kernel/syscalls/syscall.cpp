@@ -4,4 +4,7 @@
 void handle_syscall() {
     int syscall_number = read_register(Register::a7);
     printf("got syscall number %i\n", syscall_number);
+    while(true) {
+
+    }
 }
