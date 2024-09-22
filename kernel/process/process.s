@@ -5,6 +5,7 @@
 switch_to_process:
     # a0 holds the virtual start address
     # a1 holds the stack pointer
+    # a2 holds the heap start
     csrw sepc, a0
     # store the old stack pointer in sscratch
     csrw sscratch, sp
@@ -19,6 +20,7 @@ set_sum_bit:
     csrr a1, sstatus
     or a0, a0, a1
     csrw sstatus, a0
+    ret
 
 
 set_spp_zero:
@@ -28,3 +30,4 @@ set_spp_zero:
     csrr a1, sstatus
     and a0, a1, a0
     csrw sstatus, a0
+    ret
