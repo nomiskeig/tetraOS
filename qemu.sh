@@ -18,7 +18,9 @@ done
 echo ${debug}
 
 # build the kernel
-make kernel
+cd kernel
+make
+cd ..
 
 sudo ./clean_root_fs.sh
 
@@ -29,7 +31,9 @@ sudo cp -r tlibc/include/* rootFS/usr/include || true
 ## assemble crt0.s
 riscv64-tetraos-as tlibc/crt0.s -o rootFS/usr/lib/crt0.o
 
-tlibc/compile_and_build_tlibc.sh
+cd tlibc
+bear -- ./compile_and_build_tlibc.sh
+cd ..
 userspace/compile_and_build_userspace.sh
 
 mkdir datafs 
@@ -68,7 +72,7 @@ sudo losetup -d /dev/loop0
 sudo rm -rf datafs
 
 if [[ "$debug" == "true" ]]; then
-    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,scsi=off,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false -s -S
+    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false -s -S
 else 
     qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false
 fi
