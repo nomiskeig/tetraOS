@@ -52,7 +52,6 @@ void vprintf(char const *fmt, va_list args) {
                 }
                 fmt++;
             } else if (*fmt == 's') {
-                // TODO: this does not work i think, at least it is not tested
                 char *chars = va_arg(args, char *);
                 int current = 0;
                 while (chars[current] != '\0') {

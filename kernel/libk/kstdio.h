@@ -14,7 +14,8 @@ enum LogLevel {
     WARNING = 128,
     FS = 256,
     PROCESS = 512,
-    EXCEPTION = 1024
+    EXCEPTION = 1024,
+    SYSCALL = 2048
 
 };
 void printf(char const *fmt, ...);

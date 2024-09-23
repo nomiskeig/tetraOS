@@ -73,7 +73,6 @@ int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
     uint32_t index =
         (dir_entry->inode - 1) % this->super_block->s_inodes_per_group;
     uint32_t containing_block = (index * sizeof(EXT2Inode)) / this->block_size;
-    printf("containing block : %i\n", containing_block);
     this->block_device->read(
         this->block_size *
         // TODO: this is missing offset but i could not figure out how to calculate it

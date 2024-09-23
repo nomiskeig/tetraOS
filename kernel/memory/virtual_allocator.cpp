@@ -29,7 +29,6 @@ extern "C" void *memset(void *s, int c, size_t n) {
     return s;
 }
 extern "C" void *memcpy(void *dest, const void *src, size_t len) {
-    printf("Memcopy from 0x%x to 0x%x, size : 0x%x\n", src, dest, len);
     char *dest_char = (char *)dest;
     char *src_char = (char *)src;
     size_t current = 0;

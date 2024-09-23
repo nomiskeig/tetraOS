@@ -43,6 +43,9 @@ void log(LogLevel level, char const *fmt, ...) {
     case LogLevel::EXCEPTION:
         prefix = "\u001b[31m[EXCEPTION]\u001b[37m";
         break;
+    case LogLevel::SYSCALL:
+        prefix= "[SYSCALL]";
+        break;
     }
     printf(prefix);
     printf(" ");

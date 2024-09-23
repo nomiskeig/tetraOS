@@ -16,7 +16,6 @@ extern "C" int machine_exception_handler(void) {
     asm volatile("add %0, a5, zero;" : "=r"(syscal_params.a5));
     asm volatile("add %0, a6, zero;" : "=r"(syscal_params.a6));
     asm volatile("add %0, a7, zero;" : "=r"(syscal_params.a7));
-    printf("is in machine exception handler\n");
     uint64_t cause = 0x1;
     uint64_t mtval;
     // store the value we come from from userspace (this is used in the case of syscalls to return afterwards)
@@ -25,7 +24,6 @@ extern "C" int machine_exception_handler(void) {
     asm volatile("add %0, t1, zero;" : "=r"(mtval));
     asm volatile("add %0, t2, zero;" : "=r"(mepc_value));
 
-    printf("cause: 0x%x\n", cause);
     //  store the registesr a1
     switch (cause) {
     case 0x0:
@@ -50,6 +48,9 @@ extern "C" int machine_exception_handler(void) {
     case 0xF:
         log(LogLevel::EXCEPTION, "Store/AMO page fault at 0x%x", mtval);
         break;
+    default: 
+        log(LogLevel::EXCEPTION, "Got an unknown exception: %i", cause);
+        
     }
     // we do not handle exceptions gracefully, we just die lol
     while (true) {

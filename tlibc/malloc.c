@@ -25,6 +25,7 @@ void *malloc(size_t size) {
      * Allocate new phyiscal page and map it
      *
      */
+    // TODO: implement this properly
     return (void*)HEAP_START;
 
 }
