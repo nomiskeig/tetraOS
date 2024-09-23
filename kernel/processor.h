@@ -1,3 +1,6 @@
+#ifndef PROCESSOR_H
+#define PROCESSOR_H
+
 #include <tlib/stdint.h>
 
 
@@ -15,3 +18,4 @@ enum Register {
 typedef int64_t register64_t;
 
 register64_t read_register(Register reg);
+#endif

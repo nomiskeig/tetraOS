@@ -80,18 +80,18 @@ jump_to_machine_exception_handler:
 # restore the stack pointer of the kernel
    #csrr sp, sscratch
     csrr t1, mepc
-    addi a2, zero, 0
-    lui a2, %hi(0x80000000)
-    slli a2, a2, 16
-    la a3, machine_exception_handler
-    add a2, a2, a3
-    csrw mepc, a2
+    addi t3, zero, 0
+    lui t3, %hi(0x80000000)
+    slli t3, t3, 16
+    la t4, machine_exception_handler
+    add t3, t3, t4 
+    csrw mepc, t3 
     # set the MPP bit in mstatus to 1 so we jump to supervisor mode and not to usermode
-    addi a2, zero, 1
-    slli a2, a2, 11
-    csrr a3, mstatus
-    or a2, a3, a2
-    csrw mstatus, a2
+    addi t3, zero, 1
+    slli t3, t3, 11
+    csrr t4, mstatus
+    or t3, t4,t3 
+    csrw mstatus, t3
     mret 
     
 jump_to_supervisor_exception_handler:

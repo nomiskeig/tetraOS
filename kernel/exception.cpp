@@ -1,17 +1,27 @@
 #include <kernel/libk/kstdio.h>
 #include <kernel/syscalls/syscall.h>
+#include <kernel/exception.h>
 
 /*
  * Handles exceptions which trap in to the machine mode handler. We get here from jump_to_machine_exception_handler in boot.s and should be in supervisor mode.
     */
 extern "C" int machine_exception_handler(void) {
+    SyscallParameters syscal_params;
 
+    asm volatile("add %0, a1, zero;" : "=r"(syscal_params.a1));
+    asm volatile("add %0, a2, zero;" : "=r"(syscal_params.a2));
+    asm volatile("add %0, a3, zero;" : "=r"(syscal_params.a3));
+    asm volatile("add %0, a4, zero;" : "=r"(syscal_params.a4));
+    asm volatile("add %0, a5, zero;" : "=r"(syscal_params.a5));
+    asm volatile("add %0, a6, zero;" : "=r"(syscal_params.a6));
+    asm volatile("add %0, a7, zero;" : "=r"(syscal_params.a7));
     printf("is in machine exception handler\n");
     uint64_t cause = 0x1;
     uint64_t mtval;
     asm volatile("add %0, t0, zero;" : "=r"(cause));
     asm volatile("add %0, t1, zero;" : "=r"(mtval));
     printf("cause: 0x%x\n", cause);
+    //  store the registesr a1
     switch (cause) {
     case 0x0:
         log(LogLevel::EXCEPTION, "Instruction address misaligned");
@@ -23,7 +33,7 @@ extern "C" int machine_exception_handler(void) {
         log(LogLevel::EXCEPTION, "Illegal instruction");
         break;
     case 0x8:
-        handle_syscall();
+        handle_syscall(syscal_params);
         break;
 
     case 0xC:
