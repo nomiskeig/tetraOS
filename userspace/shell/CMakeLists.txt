@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_C_COMPILER riscv64-tetraos-gcc -Wl,-melf_riscv64_tetraos)
+set(CMAKE_C_COMPILER riscv64-tetraos-gcc -Wl,-melf_riscv64_tetraos -fno-builtin)
 project(shell VERSION 1.0 LANGUAGES C ASM)
 add_executable(shell shell.c)
-target_link_libraries(shell libc.a)

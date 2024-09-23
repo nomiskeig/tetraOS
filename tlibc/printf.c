@@ -1,6 +1,5 @@
 #include "syscalls/write.c"
 #include <stdlib.h>
-
 int printf(const char *fmt, ...) {
     // TODO: support printing different formats and parameters
   size_t size = 0;
