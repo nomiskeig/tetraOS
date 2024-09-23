@@ -42,21 +42,28 @@ int create_and_run_new_process(const char *file) {
         memcpy((void *)(virtual_address_start_address + (vaddr % PAGE_SIZE)),
                (void *)((uint64_t)contents + program_headers[i].p_offset),
                program_headers[i].p_filesz);
-        if (data_end < (program_headers[i].p_vaddr  + program_headers[i].p_memsz)) {
-            data_end = program_headers[i].p_vaddr  + program_headers[i].p_memsz;
+        if (data_end <
+            (program_headers[i].p_vaddr + program_headers[i].p_memsz)) {
+            data_end = program_headers[i].p_vaddr + program_headers[i].p_memsz;
         }
     }
-    log(LogLevel::PROCESS, "Jumping to process at address 0x%x", elf_header->e_entry);
-    void * stack_frame = kalloc_frame();
+    // find next 4k boundary after data_end to put heap on
+    data_end = data_end + PAGE_SIZE - (data_end % PAGE_SIZE);
+    // map the first heap page
+    void* heap_frame = kalloc_frame();
+    map_page((VirtualPage*)data_end, (PhysicalFrame*)heap_frame, 0x1F);
+
+    log(LogLevel::PROCESS, "Jumping to process at address 0x%x",
+        elf_header->e_entry);
+    void *stack_frame = kalloc_frame();
     uint64_t stack_page = 0x100000;
-    map_page((VirtualPage*)stack_page, (PhysicalFrame*)stack_frame, 0x1F);
+    map_page((VirtualPage *)stack_page, (PhysicalFrame *)stack_frame, 0x1F);
     uint64_t stack_pointer = stack_page + 4000;
     set_spp_zero();
-    switch_to_process((uint64_t)elf_header->e_entry, stack_pointer, data_end + 20);
-    while(true) {
-        log(LogLevel::ERROR, "This is after switching to userspace, something went terribly wrong");
+    switch_to_process((uint64_t)elf_header->e_entry, stack_pointer,
+                      data_end + 20);
+    while (true) {
+        log(LogLevel::ERROR, "This is after switching to userspace, something "
+                             "went terribly wrong");
     }
-
-    
-
 }
