@@ -28,5 +28,6 @@ int feof(FILE *stream);
 int vprintf(const char *format, va_list ap);
 int vfprintf(FILE *stream, const char *format, va_list ap);
 int printf(const char *fmt, ...);
+int scanf(const char* format, ...);
 
 #endif

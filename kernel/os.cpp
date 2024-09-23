@@ -1,6 +1,7 @@
 #include <kernel/UART.h>
 #include <kernel/drivers/ext2.h>
 #include <kernel/drivers/virtio/blk.h>
+#include <kernel/drivers/virtio/console.h>
 #include <kernel/libk/kstdio.h>
 #include <kernel/memory.h>
 #include <kernel/drivers/ext2.h>
@@ -17,6 +18,11 @@ extern "C" int os_start(void) {
     paging_init();
     virtual_allocator_init();
 
+    VirtIOConsoleDevice *console_device = get_console_device();
+    if (console_device == 0x0) {
+        log(LogLevel::ERROR, "Did not find a console device.");
+        return -1;
+    }
 
     uint64_t* address = 0x0;
     //*address = 'a';

@@ -74,7 +74,8 @@ sudo rm -rf datafs
 if [[ "$debug" == "true" ]]; then
     qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false -s -S
 else 
-    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false
+    qemu-system-riscv64 -machine virt -nographic  -bios u-boot.bin -drive if=none,format=raw,file=./data,id=foo -device virtio-blk-device,drive=foo -device virtio-net-device -m 2048M -global virtio-mmio.force-legacy=false -device virtio-serial-pci -device virtconsole,chardev=vcon,name=console.0 -chardev socket,id=vcon,ipv4=on,host=localhost,port=2222,server=on,telnet=on,wait=off
+
 fi
 
 

@@ -1,3 +1,4 @@
+#include "kernel/drivers/virtio/console.h"
 #include <kernel/drivers/virtio/blk.h>
 #include <kernel/drivers/virtio/virtio.h>
 #include <kernel/libk/kstdio.h>
