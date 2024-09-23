@@ -75,11 +75,17 @@ jump_to_machine_exception_handler:
     # store mcause in t0 in order to access it in user mode 
     # TODO: this should be handled better, it will break once we dont want to just die on exceptino
     csrr t0, mcause
+
     # store mtval in t1, this is the address at whihc it faield
 
-# restore the stack pointer of the kernel
-   #csrr sp, sscratch
+    # swap the stack pointers of userspace and kernel
+    # the pointer to restore is stored in sscratch
+    add t1, zero, sp
+    csrr sp, sscratch
+    csrw sscratch, t1
+
     csrr t1, mepc
+    csrr t2, mepc
     addi t3, zero, 0
     lui t3, %hi(0x80000000)
     slli t3, t3, 16

@@ -9,7 +9,5 @@ void handle_syscall(SyscallParameters syscall_params) {
     printf("got syscall a3 0x%x\n", syscall_params.a3);
     printf("got syscall number %i\n", syscall_params.a7);
     printf("print from userspace: %s", syscall_params.a2);
-    while(true) {
-
-    }
 }
+
