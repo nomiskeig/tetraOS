@@ -1,3 +1,4 @@
+#include "kernel/memory.h"
 #include <kernel/exception.h>
 #include <kernel/libk/kstdio.h>
 #include <kernel/processor.h>
@@ -10,8 +11,11 @@ void handle_syscall(SyscallParameters syscall_params) {
         read((void *)syscall_params.a2, syscall_params.a3);
         break;
     case 1:
-        printf("%s", syscall_params.a2);
+        void *buffer = kalloc(syscall_params.a3 + 1);
+        memcpy(buffer, (void *)syscall_params.a2, syscall_params.a3);
+        *(((char*)buffer) + syscall_params.a3) = '\0';
+        printf("%s", buffer);
+            // TODO: free the buffer
         break;
     }
 }
-
