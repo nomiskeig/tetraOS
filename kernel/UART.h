@@ -10,5 +10,6 @@
 
 void uart_init();
 void put_char(const char c);
+char get_char();
 
 #endif

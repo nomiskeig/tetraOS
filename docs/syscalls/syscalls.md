@@ -12,4 +12,6 @@ Syscalls available with their number are:
 
 | System call | number | status |
 | ----------- | ------ | ------ | 
+| Read        | 0 
 | Write       | 1 
+
