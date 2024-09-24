@@ -7,6 +7,7 @@ cd $(dirname $0)
 echo "Compiling libc"
 rm -rf build/*
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/write.c -o build/write.o
+riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/read.c -o build/read.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/sbrk.c -o build/sbrk.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/syscall.c -o build/syscalls.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos printf.c -o build/printf.o
