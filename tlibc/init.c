@@ -5,6 +5,7 @@ static size_t HEAP_START;
 void initialize_standard_library() {
     asm("add %0, zero, a2;": "=r"(HEAP_START));
     malloc_init();
+    init_printf();
 
 
 }
