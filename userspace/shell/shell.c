@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include "builtins.h"
 
 int main() {
     int a = 0;
@@ -8,7 +10,12 @@ int main() {
     printf("test from userspace\n");
     printf("second test, lets see if this works\n");
     printf("and a third time\n");
-    //scanf("%s", buffer);
+    read(0, buffer, 20);
+    printf("got input in userspace: %s\n",buffer);
+    if (strcmp(buffer, "pwd") == 0) {
+        pwd();
+    }
+
     while (1) {
 
     }
