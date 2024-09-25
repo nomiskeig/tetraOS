@@ -6,6 +6,8 @@
 extern "C" void switch_to_process(long, long, long);
 extern "C" void set_sum_bit();
 extern "C" void set_spp_zero();
+static bool created = false;
+static Scheduler* instance = 0x0;
 
 int Scheduler::submit_new_process(const char *file) {
     log(LogLevel::PROCESS, "Creating process %s", file);
@@ -87,6 +89,7 @@ void Scheduler::add_new_process(Process *process) {
 };
 
 Scheduler::Scheduler() {
+    printf("is in constructor");
     this->next_id = 0;
     this->first_process = 0x0;
 };
@@ -95,6 +98,7 @@ process_id_t Scheduler::get_next_process_id() { return this->next_id++; }
 
 void Scheduler::run_next_process() {
     ProcessListItem *processItem = this->first_process;
+    
 
     while (!processItem->process->is_ready()) {
         printf("iterating");
@@ -112,3 +116,16 @@ void Scheduler::run_next_process() {
                              "went terribly wrong");
     }
 }
+
+Scheduler *Scheduler::get_instance() {
+    printf("getting instacne\n");
+    printf("instance: 0x%x\n", instance);
+    if (!created) {
+        printf("allocating instance");
+        instance = new Scheduler();
+        created = true;
+    }
+    printf("instance: 0x%x\n", instance);
+    return instance;
+}
+

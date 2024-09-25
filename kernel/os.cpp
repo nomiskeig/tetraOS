@@ -18,22 +18,6 @@ extern "C" int os_start(void) {
     paging_init();
     virtual_allocator_init();
 
-    // char c= get_char();
-    // printf("got input: %c \n",c);
-
-    /*
-    VirtIOConsoleDevice *console_device = get_console_device();
-    if (console_device == 0x0) {
-        log(LogLevel::ERROR, "Did not find a console device.");
-        return -1;
-    }
-    */
-    // void *input = kalloc(20);
-    // size_t amount = read(input, 20);
-    // printf("you wrote this as string: %s\n", (char *)input);
-
-    uint64_t *address = 0x0;
-    //*address = 'a';
 
     VirtIOBlockDevice *block_device = get_block_device();
     if (block_device == 0x0) {
@@ -54,8 +38,9 @@ extern "C" int os_start(void) {
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
-    Scheduler *scheduler = new Scheduler();
+    Scheduler *scheduler = Scheduler::get_instance();
     scheduler->submit_new_process("usr/bin/shell");
+    printf("submitted process\n");
     scheduler->run_next_process();
 
     return 0;
