@@ -118,14 +118,13 @@ void Scheduler::run_next_process() {
 }
 
 Scheduler *Scheduler::get_instance() {
-    printf("getting instacne\n");
-    printf("instance: 0x%x\n", instance);
     if (!created) {
-        printf("allocating instance");
         instance = new Scheduler();
         created = true;
     }
-    printf("instance: 0x%x\n", instance);
     return instance;
 }
 
+Process* Scheduler::get_running_process() {
+    return this->current_process;
+}

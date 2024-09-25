@@ -8,6 +8,7 @@ private:
     const char* path_string ;
 public:
     Path(const char* path);
+    void copy_into(char* buffer);
 
     
 };
@@ -30,6 +31,7 @@ public:
     address_t get_heap_start_address();
     address_t get_stack_pointer();
     process_id_t get_id();
+    Path* get_cwd();
 
 
 

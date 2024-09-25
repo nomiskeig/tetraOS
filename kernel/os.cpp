@@ -9,9 +9,9 @@
 
 extern "C" int os_start(void) {
     uart_init();
-    set_log_level(LogLevel::SYSCALL | LogLevel::EXCEPTION | LogLevel::PAGING |
+    set_log_level(LogLevel::SYSCALL | LogLevel::EXCEPTION | 
                   LogLevel::SYSTEM | LogLevel::ERROR | LogLevel::WARNING |
-                  LogLevel::VIRTIO | LogLevel::FS | LogLevel::PROCESS | LogLevel::VIRTUAL_MEMORY);
+                   LogLevel::PROCESS );
     log(LogLevel::SYSTEM, "Booted to OS");
 
     physical_allocator_init();
