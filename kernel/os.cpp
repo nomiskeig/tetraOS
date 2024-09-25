@@ -11,7 +11,7 @@ extern "C" int os_start(void) {
     uart_init();
     set_log_level(LogLevel::SYSCALL | LogLevel::EXCEPTION | LogLevel::PAGING |
                   LogLevel::SYSTEM | LogLevel::ERROR | LogLevel::WARNING |
-                  LogLevel::VIRTIO | LogLevel::FS | LogLevel::PROCESS);
+                  LogLevel::VIRTIO | LogLevel::FS | LogLevel::PROCESS | LogLevel::VIRTUAL_MEMORY);
     log(LogLevel::SYSTEM, "Booted to OS");
 
     physical_allocator_init();
@@ -28,10 +28,9 @@ extern "C" int os_start(void) {
         return -1;
     }
     */
-    //void *input = kalloc(20);
-   // size_t amount = read(input, 20);
-    //printf("you wrote this as string: %s\n", (char *)input);
-
+    // void *input = kalloc(20);
+    // size_t amount = read(input, 20);
+    // printf("you wrote this as string: %s\n", (char *)input);
 
     uint64_t *address = 0x0;
     //*address = 'a';
@@ -55,7 +54,9 @@ extern "C" int os_start(void) {
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
-    create_and_run_new_process("usr/bin/shell");
+    Scheduler *scheduler = new Scheduler();
+    scheduler->submit_new_process("usr/bin/shell");
+    scheduler->run_next_process();
 
     return 0;
 }

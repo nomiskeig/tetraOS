@@ -2,6 +2,7 @@
 #define PROCESSOR_H
 
 #include <tlib/stdint.h>
+#include <tlib/stddef.h>
 
 
 enum Register {
@@ -16,6 +17,7 @@ enum Register {
 
 };
 typedef int64_t register64_t;
+typedef size_t address_t;
 
 register64_t read_register(Register reg);
 #endif
