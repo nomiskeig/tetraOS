@@ -132,6 +132,12 @@ int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
     size_t size = 0;
     while (path[current] != '\0') {
         if (path[current] == '/') {
+            if (current == 0) {
+                // special case of the root folder
+                current++;
+                continue;
+
+            }
             current++;
             // found a folder
             char *folder_name = (char *)kalloc(sizeof(char) * (size + 1));

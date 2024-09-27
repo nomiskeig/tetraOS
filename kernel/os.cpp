@@ -11,7 +11,7 @@ extern "C" int os_start(void) {
     uart_init();
     set_log_level(LogLevel::SYSCALL | LogLevel::EXCEPTION | 
                   LogLevel::SYSTEM | LogLevel::ERROR | LogLevel::WARNING |
-                   LogLevel::PROCESS );
+                   LogLevel::PROCESS | LogLevel::FS);
     log(LogLevel::SYSTEM, "Booted to OS");
 
     physical_allocator_init();
@@ -26,20 +26,20 @@ extern "C" int os_start(void) {
     }
     block_device->init();
     EXT2 *ext2 = new EXT2(block_device);
-    size_t testfile_size = get_file_size("testfile.txt");
+    size_t testfile_size = get_file_size("/testfile.txt");
     char *buffer1 = (char *)kalloc(testfile_size);
-    read_file("testfile.txt", testfile_size, buffer1);
+    read_file("/testfile.txt", testfile_size, buffer1);
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
-    size_t testfile2_size = get_file_size("testfile.txt");
-    char *buffer2 = (char *)kalloc(testfile_size);
-    read_file("folder1/folder2/folder3/file.txt", testfile_size, buffer1);
+    size_t testfile2_size = get_file_size("/folder1/folder2/folder3/file.txt");
+    char *buffer2 = (char *)kalloc(testfile2_size);
+    read_file("/folder1/folder2/folder3/file.txt", testfile_size, buffer1);
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
     Scheduler *scheduler = Scheduler::get_instance();
-    scheduler->submit_new_process("usr/bin/shell");
+    scheduler->submit_new_process("/usr/bin/shell");
     printf("submitted process\n");
     scheduler->run_next_process();
 
