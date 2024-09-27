@@ -108,6 +108,7 @@ void Scheduler::run_next_process() {
     Process *process = processItem->process;
     log(LogLevel::PROCESS, "Running next process with id %i",
         process->get_id());
+    this->current_process = process;
     switch_to_process(process->get_entry_address(),
                       process->get_stack_pointer(),
                       process->get_heap_start_address());
