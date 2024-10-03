@@ -17,4 +17,6 @@ void *sbrk(intptr_t incremement);
 ssize_t read(int fildes, void *buf, size_t nybte);
 
 char *getcwd(char *buf, size_t size);
+
+long syscall(long number, ...);
 #endif
