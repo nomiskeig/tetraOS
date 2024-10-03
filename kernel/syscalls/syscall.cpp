@@ -9,13 +9,13 @@ void handle_syscall(SyscallParameters syscall_params) {
         syscall_params.a7);
     switch (syscall_params.a7) {
     case 0: {
-        read((void *)syscall_params.a2, syscall_params.a3);
+        read((void *)syscall_params.a1, syscall_params.a2);
         break;
     }
     case 1: {
-        void *buffer = kalloc(syscall_params.a3 + 1);
-        memcpy(buffer, (void *)syscall_params.a2, syscall_params.a3);
-        *(((char *)buffer) + syscall_params.a3) = '\0';
+        void *buffer = kalloc(syscall_params.a2 + 1);
+        memcpy(buffer, (void *)syscall_params.a1, syscall_params.a2);
+        *(((char *)buffer) + syscall_params.a2) = '\0';
         printf("%s", buffer);
         // TODO: free the buffer
         break;
@@ -29,7 +29,7 @@ void handle_syscall(SyscallParameters syscall_params) {
             printf("b\n");
         Path *path = current_process->get_cwd();
             printf("c\n");
-        path->copy_into((char *)syscall_params.a1);
+        path->copy_into((char *)syscall_params.a0);
             printf("d\n");
         break;
     }

@@ -9,12 +9,12 @@ extern "C" void jump_back_to_userspace(long);
 extern "C" int machine_exception_handler(void) {
     // put the syscall parameters onto the stack so that we do not have to worry about overwriting it
     SyscallParameters syscal_params;
+    asm volatile("add %0, a0, zero;" : "=r"(syscal_params.a0));
     asm volatile("add %0, a1, zero;" : "=r"(syscal_params.a1));
     asm volatile("add %0, a2, zero;" : "=r"(syscal_params.a2));
     asm volatile("add %0, a3, zero;" : "=r"(syscal_params.a3));
     asm volatile("add %0, a4, zero;" : "=r"(syscal_params.a4));
     asm volatile("add %0, a5, zero;" : "=r"(syscal_params.a5));
-    asm volatile("add %0, a6, zero;" : "=r"(syscal_params.a6));
     asm volatile("add %0, a7, zero;" : "=r"(syscal_params.a7));
     uint64_t cause = 0x1;
     uint64_t mtval;
