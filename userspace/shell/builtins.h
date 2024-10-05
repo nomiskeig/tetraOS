@@ -1,3 +1,4 @@
 
 
 void pwd();
+void ls();

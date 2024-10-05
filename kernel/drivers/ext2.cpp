@@ -22,7 +22,6 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
         this->group_descs[i] = new EXT2BlockGroupDescriptor();
     }
     for (size_t i = 0; i < amount_groups; i++) {
-
         this->block_device->read(
             this->block_size * 1 + i * sizeof(EXT2BlockGroupDescriptor),
             sizeof(EXT2BlockGroupDescriptor), (char *)this->group_descs[i]);
@@ -37,7 +36,7 @@ EXT2::EXT2(VirtIOBlockDevice *block_device) {
  * f2
  * */
 int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
-    log(LogLevel::FS, "Getting inode of dir %s in dir %s", name);
+    log(LogLevel::FS, "Getting inode of dir %s", name);
     if ((dir->i_mode & 0x4000) == 0x0) {
         log(LogLevel::ERROR,
             "get_inode_in_dir can only be called on directories, you called it "
@@ -67,7 +66,6 @@ int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
     }
     // TODO: this breaks if entry cannot be found
 
-
     uint32_t desc_index =
         (dir_entry->inode - 1) / this->super_block->s_inodes_per_group;
     uint32_t index =
@@ -75,8 +73,8 @@ int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
     uint32_t containing_block = (index * sizeof(EXT2Inode)) / this->block_size;
     this->block_device->read(
         this->block_size *
-        // TODO: this is missing offset but i could not figure out how to calculate it
-        // Should replace the + 0 below
+                // TODO: this is missing offset but i could not figure out how
+                // to calculate it Should replace the + 0 below
                 (group_descs[desc_index]->bg_inode_table + 0) +
             sizeof(EXT2Inode) * index,
         sizeof(EXT2Inode), (char *)dir);
@@ -85,20 +83,22 @@ int EXT2::get_inode_in_dir(EXT2Inode *dir, const char *name) {
 
 size_t EXT2::get_file_size(const char *name) {
     EXT2Inode *inode = new EXT2Inode();
-    this->block_device->read(this->block_size * group_descs[0]->bg_inode_table +
-                                 sizeof(EXT2Inode) * 1,
-                             sizeof(EXT2Inode), (char *)inode);
+    get_root_inode(inode);
     get_inode_from_dir(inode, name);
     // TODO: free inode
     return inode->i_size;
 }
 
-int EXT2::read_file(const char *name, size_t size, char *data) {
-    EXT2Inode *inode = new EXT2Inode();
+void EXT2::get_root_inode(EXT2Inode *inode) {
     this->block_device->read(this->block_size * group_descs[0]->bg_inode_table +
                                  sizeof(EXT2Inode) * 1,
                              sizeof(EXT2Inode), (char *)inode);
 
+}
+
+int EXT2::read_file(const char *name, size_t size, char *data) {
+    EXT2Inode *inode = new EXT2Inode();
+    get_root_inode(inode);
     get_inode_from_dir(inode, name);
 
     this->block_device->read(this->block_size * inode->i_block[0], size, data);
@@ -127,6 +127,11 @@ bool EXT2LinkedListDirectory::matches(const char *other_name) {
  */
 int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
     log(LogLevel::FS, "Getting inode of file: %s", path);
+    size_t path_length = 0;
+    while (path[path_length]) {
+        path_length++;
+    }
+    bool ends_in_folder = false;
 
     size_t current = 0;
     size_t size = 0;
@@ -136,10 +141,12 @@ int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
                 // special case of the root folder
                 current++;
                 continue;
-
             }
             current++;
+
             // found a folder
+
+            printf("getting inode in  loop, pathlength: %i, current: %i\n", path_length, current);
             char *folder_name = (char *)kalloc(sizeof(char) * (size + 1));
             for (size_t i = 0; i < size; i++) {
                 folder_name[i] = path[current - size + i - 1];
@@ -150,9 +157,17 @@ int EXT2::get_inode_from_dir(EXT2Inode *dir, const char *path) {
                 return res;
             }
             size = 0;
+            // check if it is the last / in which case we return the folder
+            if (path_length == current) {
+                ends_in_folder = true;
+                break;
+            }
         }
         current++;
         size++;
+    }
+    if (ends_in_folder) {
+        return 0;
     }
 
     // only the file is left

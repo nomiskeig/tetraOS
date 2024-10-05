@@ -80,9 +80,31 @@ jump_to_machine_exception_handler:
 
     # swap the stack pointers of userspace and kernel
     # the pointer to restore is stored in sscratch
+    # sp is now the kernel sp
     add t1, zero, sp
     csrr sp, sscratch
     csrw sscratch, t1
+
+
+    # put s0-s11 on the stack 
+    # thats 12 * 8 = 96 bytes
+    # see https://stackoverflow.com/questions/59302235/stack-memory-operations-at-the-beginning-of-main-function-in-assembly and https://riscv.org/wp-content/uploads/2015/01/riscv-calling.pdf
+
+    addi sp, sp, -96
+    sd s0, 0(sp)
+    sd s1, 8(sp)
+    sd s2, 16(sp)
+    sd s3, 24(sp)
+    sd s4, 32(sp)
+    sd s5, 40(sp)
+    sd s6, 48(sp)
+    sd s7, 56(sp)
+    sd s8, 64(sp)
+    sd s9, 72(sp)
+    sd s10, 80(sp)
+    sd s11, 88(sp)
+
+
 
     csrr t1, mepc
     csrr t2, mepc

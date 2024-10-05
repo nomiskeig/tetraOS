@@ -6,7 +6,7 @@
 #include <kernel/memory.h>
 #include <kernel/os.h>
 #include <kernel/process/scheduler.h>
-
+#include <kernel/vfs.h>
 extern "C" int os_start(void) {
     uart_init();
     set_log_level(LogLevel::SYSCALL | LogLevel::EXCEPTION | 
@@ -38,6 +38,7 @@ extern "C" int os_start(void) {
     for (size_t i = 0; i < testfile_size; i++) {
         printf("%c", *(buffer1 + i));
     }
+    VFS *vfs = new VFS();
     Scheduler *scheduler = Scheduler::get_instance();
     scheduler->submit_new_process("/usr/bin/shell");
     printf("submitted process\n");

@@ -1,8 +1,15 @@
 #include "../tlibc.h"
 #include <stdarg.h>
+#include <stdio.h>
 
-
+typedef struct Registers {
+    long gp;
+} Registers;
 long syscall(long number, ...) {
+    Registers regs;
+    //asm volatile("add %0, gp, zero;" : "=r"(regs.gp));
+    
+    // TODO: return result
     // TODO: save CPU registers
 
     va_list args;
@@ -16,5 +23,11 @@ long syscall(long number, ...) {
     asm("add a5, zero, a6" : : :);
     asm("add a7, zero, %0" : : "r"(number) :);
     asm("ecall");
+    long return_value;
+    asm volatile("add %0, a0, zero;" : "=r"(return_value));
+    //asm("add gp, zero, %0" : : "r"(regs.gp) :);
     // TODO restore CPU registers
+
+     return return_value;
+    //return 0;
 }

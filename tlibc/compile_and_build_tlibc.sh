@@ -11,6 +11,7 @@ riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/read.c -o build/read.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/sbrk.c -o build/sbrk.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/getcwd.c -o build/getcwd.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/syscall.c -o build/syscalls.o
+riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos syscalls/open.c -o build/open.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos printf.c -o build/printf.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos malloc.c -o build/malloc.o
 riscv64-tetraos-gcc -c -Wl,-melf_riscv64_tetraos string.c -o build/string.o

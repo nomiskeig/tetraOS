@@ -2,7 +2,8 @@
 #include <kernel/syscalls/syscall.h>
 #include <kernel/exception.h>
 
-extern "C" void jump_back_to_userspace(long);
+// first is the address that caused the exception, the second one is a return value
+extern "C" void jump_back_to_userspace(long, long);
 /*
  * Handles exceptions which trap in to the machine mode handler. We get here from jump_to_machine_exception_handler in boot.s and should be in supervisor mode.
     */
@@ -37,7 +38,9 @@ extern "C" int machine_exception_handler(void) {
         break;
     case 0x8:
         handle_syscall(syscal_params);
-        jump_back_to_userspace(mepc_value);
+            long ret_value;
+    asm volatile("add %0, a0, zero;" : "=r"(ret_value));
+        jump_back_to_userspace(mepc_value, ret_value);
         break;
     case 0xC:
         log(LogLevel::EXCEPTION, "Instruction page fault at 0x%x", mtval);
